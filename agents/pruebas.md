@@ -16,4 +16,6 @@ Playwright usa un solo worker. El servidor reenvía cada mensaje a todos los soc
 
 En GitHub Actions se ejecutan las tres suites en el trabajo `test`; `deploy` depende de ese trabajo. Chromium se instala antes de ejecutar Playwright. En CI, Playwright corre sin ventana y sin `slowMo`; localmente conserva el navegador visible y la pausa para depurar.
 
+En un fork, GitHub puede dejar los workflows deshabilitados inicialmente. Hay que habilitarlos en la pestaña Actions y hacer un nuevo push a `master` para iniciar la primera ejecución.
+
 Selectores que no se rompen: título `Chat Socket.IO UNA`, `#nombre`, `#m`, botón `Send`, `#messages`. El estado vacío no es un `li` dentro de `#messages`. Un `<script>` se ve como texto y no abre un diálogo. Una URL de imagen aceptada queda en `img[src]`; una de YouTube, en un `iframe` de embed.
