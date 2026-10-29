@@ -11,9 +11,9 @@ module.exports = defineConfig({
   use: {
     ...devices['Desktop Chrome'],
     baseURL: 'http://127.0.0.1:3000',
-    headless: false,
+    headless: Boolean(process.env.CI),
     launchOptions: {
-      slowMo: 1000
+      slowMo: process.env.CI ? 0 : 1000
     }
   },
   webServer: {
