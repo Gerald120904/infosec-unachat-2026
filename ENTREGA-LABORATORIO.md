@@ -1,4 +1,4 @@
-# Laboratorio 6 — Monitoreo de UNA Chat
+# Laboratorio 7 — Monitoreo de UNA Chat
 
 **Estudiante:** Gerald  
 **Fecha:** 2026-10-31

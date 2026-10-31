@@ -3,8 +3,8 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { chromium } = require('@playwright/test');
 
-const htmlPath = path.join(__dirname, 'Laboratorio-6-Gerald.html');
-const pdfPath = path.join(__dirname, 'Laboratorio-6-Gerald.pdf');
+const htmlPath = path.join(__dirname, 'laboratorio-7-gerald.html');
+const pdfPath = path.join(__dirname, 'Laboratorio-7-Gerald.pdf');
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
