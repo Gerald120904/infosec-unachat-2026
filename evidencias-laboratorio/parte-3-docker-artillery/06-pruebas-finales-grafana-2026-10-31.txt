@@ -1,0 +1,9 @@
+Fecha: 2026-10-31
+Node.js: 24.22.2
+Mocha: 12 passing (CLI directa)
+Jest integración: 5 passing (CLI directa, --runInBand)
+Playwright E2E: 6 passed (CLI directa, reporter line)
+Total: 23/23 aprobadas.
+Docker Compose: contenedor una-chat healthy en 127.0.0.1:3000; GET / HTTP 200.
+Grafana: Loki, métricas Prometheus/Mimir y trazas Tempo consultables; correlación log-traza por trace_id demostrada en Explore.
+Comandos ejecutados con el binario Node.js 24.22.2 descargado en caché local y las CLI instaladas del proyecto. No se cambió la configuración de Vercel para esta fase.

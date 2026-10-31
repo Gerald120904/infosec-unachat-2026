@@ -1,0 +1,31 @@
+Fecha: 2026-10-31 10:26:45 -06:00
+Entorno: Windows + Docker Compose local; Grafana Cloud stack earnestbus1072, us-east-3
+Servicio observado: una-chat
+Entorno OTEL: local; runtime Docker
+
+Configuración examinada
+- .env.example OTLP URL: https://otlp-gateway-prod-us-east-3.grafana.net/otlp; coincide con el endpoint de la instancia real.
+- Authorization se emite como Basic%20 seguido del valor Basic codificado. El parser de cabeceras del exporter OTLP de Node aplica URI decoding y produce el espacio requerido.
+- OTEL_SAFE_DIAGNOSTICS=true informa tipo/código de error de exportación sin escribir credenciales.
+- Vercel queda excluido de los exporters.
+
+Pruebas funcionales
+- GET / -> 200.
+- POST local válido a /__lab/message -> 200; la ruta reutiliza el procesamiento del servidor.
+- POST local con JSON malformado -> 400 (error controlado).
+- Socket.IO WebSocket en /api/socket-io/socket.io: conexión, Evento-Mensaje-Server enviado y respuesta recibida.
+
+Consultas remotas (Grafana Explore, intervalo de una hora)
+- Loki: {service_name="una-chat"} |= "chat.message.processed" -> evento visible con deployment_environment=local, runtime=docker, transport=socket.io.
+- Prometheus/Mimir: http_server_requests_total y chat_messages_processed_total -> series visibles para servicio y entorno local.
+- Prometheus/Mimir: http_server_duration_milliseconds_bucket -> buckets de latencia visibles.
+- Prometheus/Mimir: http_server_errors_total -> series de errores controlados visibles.
+- Tempo: TraceQL para resource.service.name=una-chat -> trazas consultables; la traza del evento Socket.IO tiene tres spans.
+- Correlación: “Logs for this trace” en Tempo abre Loki; Loki devuelve el evento con el mismo trace_id que la traza.
+
+Resultado de exportación
+- Las tres señales están consultables; esta afirmación se basa en respuestas de Explore, no solo en el HTTP 200 del gateway.
+- Tras reconstruir la imagen no se observaron eventos otel.export.failed en el registro reciente del contenedor. La única advertencia fue el atributo resource host.id con valor inválido, no bloqueante.
+- La variable token se mantiene en .env ignorado por Git y se elimina del entorno antes de iniciar Node. No se registran claves, cabeceras ni contenido del chat.
+
+Evidencias de interfaz y consultas: los PNG y JPG de esta carpeta, cada uno con su sidecar descriptivo.

@@ -1,0 +1,8 @@
+Capture date: 2026-10-31
+Service/platform: Grafana Cloud, stack earnestbus1072
+Observed service: una-chat
+Environment: local (Docker)
+Interval: Last 1 hour, as shown in Explore.
+Query: Tempo TraceQL: { resource.service.name = "una-chat" }; Evento-Mensaje-Server trace detail.
+Result: Tempo opened the trace log query; Loki returned the event filtered by the same trace_id.
+Source: authentic screenshot from the authenticated integrated browser; PNG format copy from the original JPEG, with no crop or annotations. No credentials.

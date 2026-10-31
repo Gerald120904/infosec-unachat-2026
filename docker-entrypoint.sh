@@ -6,7 +6,7 @@ set -eu
 if [ -n "${GRAFANA_CLOUD_OTLP_TOKEN:-}" ]; then
   : "${GRAFANA_CLOUD_OTLP_INSTANCE_ID:?Set the local Grafana Cloud OTLP instance ID}"
   auth="$(printf '%s' "${GRAFANA_CLOUD_OTLP_INSTANCE_ID}:${GRAFANA_CLOUD_OTLP_TOKEN}" | base64 | tr -d '\n')"
-  export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic ${auth}"
+  export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic%20${auth}"
 fi
 unset GRAFANA_CLOUD_OTLP_TOKEN
 

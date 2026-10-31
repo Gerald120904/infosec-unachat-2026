@@ -1,0 +1,6 @@
+Fecha de captura: 2026-10-30
+Servicio/plataforma: Grafana Labs, organización earnestbus1072
+Configuración: Access Policy una-chat-local-otel-write
+Resultado: política activa con scopes logs:write, metrics:write y traces:write. El detalle de tokens no aparece en la evidencia.
+Límite: demuestra permisos configurados, no ingestión. La ingestión real se verificó después en Explore el 2026-10-31; consulte 03-otlp-ingestion-verificada-2026-10-31.txt.
+Origen: captura auténtica de la sesión autenticada del navegador.

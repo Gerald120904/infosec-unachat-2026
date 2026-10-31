@@ -34,6 +34,10 @@ code, .mono { font-family:Consolas,monospace; font-size:9pt; }
 .cover .meta { margin-top:30pt; border-top:2px solid #d8a340; padding-top:12pt; width:4.9in; }
 .grid { display:grid; grid-template-columns:1fr 1fr; gap:9pt; }
 .small { font-size:9pt; color:#526965; }
+.grafana-grid { display:grid; grid-template-columns:1fr 1fr; gap:7pt; }
+.grafana-grid figure { margin:0; min-width:0; }
+.grafana-grid img { width:100%; height:1.75in; object-fit:contain; border:1px solid #ccd9d6; }
+.grafana-grid figcaption { font-size:8pt; color:#516c67; margin-top:2pt; }
 a { color:#126a87; text-decoration:none; }
 </style>
 </head>
@@ -42,7 +46,7 @@ a { color:#126a87; text-decoration:none; }
  <div class="eyebrow">Seguridad Informática · Universidad Nacional</div>
  <h1>Laboratorio 6<br>Monitoreo de UNA Chat</h1>
  <p class="lead">Vercel, Cronitor, Sentry, OpenTelemetry, Grafana Cloud, Docker y Artillery</p>
-  <div class="meta"><p><b>Estudiante:</b> Gerald</p><p><b>Fecha:</b> 31 de octubre de 2026</p><p><b>Repositorio:</b><br><a href="https://github.com/Gerald120904/infosec-unachat-2026">github.com/Gerald120904/infosec-unachat-2026</a></p><p><b>Estado:</b> Sentry recibió un evento real; variables temporales retiradas. Grafana Cloud sigue pendiente de ingestión.</p></div>
+  <div class="meta"><p><b>Estudiante:</b> Gerald</p><p><b>Fecha:</b> 31 de octubre de 2026</p><p><b>Repositorio:</b><br><a href="https://github.com/Gerald120904/infosec-unachat-2026">github.com/Gerald120904/infosec-unachat-2026</a></p><p><b>Estado:</b> despliegue público verificado; las tres señales OTLP locales se consultaron en Grafana Cloud.</p></div>
  <div class="footer"><span>UNA Chat · Laboratorio de monitoreo</span><span>1 / 12</span></div>
 </section>
 <section class="page">
@@ -52,7 +56,7 @@ a { color:#126a87; text-decoration:none; }
  <ul><li>Publicar el fork en Vercel con Node.js 24 y verificar el intercambio de mensajes Socket.IO sobre WebSocket.</li><li>Monitorear el endpoint público con Cronitor y habilitar alertas.</li><li>Preparar Sentry para registrar errores del entorno Vercel.</li><li>Enviar logs, métricas y trazas únicamente desde la ejecución local/Docker hacia Grafana Cloud.</li><li>Comparar 300 mensajes Socket.IO y 300 solicitudes HTTP de prueba exclusivamente contra localhost.</li></ul>
  <div class="accent"><b>Regla de alcance:</b> Artillery nunca se ejecutó contra Vercel. No se enviaron logs locales, métricas ni trazas desde el runtime público Vercel hacia Grafana Cloud.</div>
  <h3>Estado comprobable</h3>
-  <table><tr><th>Componente</th><th>Estado</th></tr><tr><td>Vercel + Socket.IO</td><td>Commit 0f998db Ready; HTTP 200 y respuesta Socket.IO verificados.</td></tr><tr><td>Cronitor</td><td>URL asignada; Healthy, alertas activas.</td></tr><tr><td>Sentry</td><td>Error controlado recibido en Production; variables temporales retiradas.</td></tr><tr><td>Grafana Cloud</td><td>Política OTLP limitada creada; ingestión pendiente de consulta.</td></tr><tr><td>Docker + Artillery</td><td>Operativo; carga local completada.</td></tr></table>
+  <table><tr><th>Componente</th><th>Estado</th></tr><tr><td>Vercel + Socket.IO</td><td>Deployment Ready; HTTP 200 y respuesta Socket.IO verificados.</td></tr><tr><td>Cronitor</td><td>URL asignada; Healthy, alertas activas.</td></tr><tr><td>Sentry</td><td>Error controlado recibido en Production; variables temporales retiradas.</td></tr><tr><td>Grafana Cloud</td><td>Loki, Prometheus y Tempo recibieron datos locales consultables.</td></tr><tr><td>Docker + Artillery</td><td>Operativo; carga local completada.</td></tr></table>
  <div class="footer"><span>Objetivo y alcance</span><span>2 / 12</span></div>
 </section>
 <section class="page">
@@ -60,7 +64,7 @@ a { color:#126a87; text-decoration:none; }
  <p>UNA Chat utiliza Express para servir la interfaz y Socket.IO para recibir el evento <span class="mono">Evento-Mensaje-Server</span> y difundir el mensaje a los clientes conectados.</p>
  <h3>Cambios implementados</h3>
  <ul><li>Socket.IO usa la ruta <code>/api/socket-io/socket.io</code> en cliente, servidor y pruebas, con transporte WebSocket y reconexión.</li><li>OpenTelemetry se inicializa antes de Express/HTTP; se agregaron spans de mensajes y métricas HTTP/chat.</li><li>Pino produce eventos estructurados con <code>trace_id</code> y <code>span_id</code>, sin registrar el texto del chat.</li><li>Sentry Node SDK solo inicia en Vercel y requiere <code>SENTRY_DSN</code>; se desactiva el envío de PII y se filtran cookies, cabeceras y query strings.</li><li>La ruta HTTP de laboratorio <code>/__lab/message</code> solo está disponible fuera de Vercel y reutiliza el validador real.</li><li>Docker publica el servicio solamente en <code>127.0.0.1:3000</code>.</li></ul>
- <div class="accent warn"><b>Privacidad de telemetría:</b> la configuración previene exportar desde Vercel. La entrega OTLP real desde Docker todavía requiere validar credenciales localmente en el archivo ignorado <code>.env</code>.</div>
+ <div class="accent warn"><b>Privacidad de telemetría:</b> la configuración impide exportar desde Vercel. Solo la ejecución local/Docker lee las credenciales OTLP desde el archivo ignorado <code>.env</code>.</div>
  <h3>Protocolo Socket.IO verificado</h3><p>El cliente envía una cadena JSON con <code>nombre</code>, <code>mensaje</code> y <code>color</code> a <code>Evento-Mensaje-Server</code>. El servidor valida el contenido y lo difunde a los clientes mediante el evento de respuesta del chat. Las pruebas validan recepción en ambos clientes.</p>
  <div class="footer"><span>Arquitectura</span><span>3 / 12</span></div>
 </section>
@@ -101,13 +105,16 @@ a { color:#126a87; text-decoration:none; }
  <div class="footer"><span>Sentry · estado verificado</span><span>7 / 12</span></div>
 </section>
 <section class="page">
- <div class="eyebrow">07 · Grafana Cloud</div><h2>Permisos OTLP y señales</h2>
- <p>Se configuró la política <code>una-chat-local-otel-write</code> en la organización Grafana. Sus únicos permisos son <code>logs:write</code>, <code>metrics:write</code> y <code>traces:write</code>.</p>
- <img class="screen short" src="../../evidencias-laboratorio/parte-2-grafana/01-grafana-politica-otlp-scopes-2026-10-30.png">
- <h3>Separación por entorno</h3>
- <ul><li>El endpoint OTLP se usa desde el proceso local/Docker.</li><li>La imagen construye el encabezado de autorización desde <code>GRAFANA_CLOUD_OTLP_TOKEN</code> y descarta la variable en el arranque.</li><li>La configuración impide exportar telemetría cuando se ejecuta bajo Vercel.</li></ul>
- <div class="accent warn"><b>Pendiente:</b> validar la credencial dentro del <code>.env</code> ignorado por Git y consultar realmente logs, métricas y trazas en Grafana Cloud. La captura demuestra permisos, no ingestión.</div>
- <div class="footer"><span>Grafana Cloud · scopes configurados</span><span>8 / 12</span></div>
+ <div class="eyebrow">07 · Grafana Cloud</div><h2>Logs, métricas y trazas recibidos</h2>
+ <p>El endpoint del stack en <code>us-east-3</code> coincide con <code>.env.example</code>. La autenticación usa <code>Authorization=Basic%20…</code>; el parser OTLP decodifica <code>%20</code> a espacio. El token permanece en el <code>.env</code> local ignorado por Git y Vercel tiene exportación desactivada.</p>
+ <div class="grafana-grid">
+  <figure><img src="../../evidencias-laboratorio/parte-2-grafana/grafana-loki-logs-2026-10-31.png"><figcaption>Loki · evento del chat · service=una-chat, environment=local · Last 1 hour.</figcaption></figure>
+  <figure><img src="../../evidencias-laboratorio/parte-2-grafana/grafana-prometheus-requests-2026-10-31.png"><figcaption>Prometheus/Mimir · solicitudes HTTP y series del servicio local.</figcaption></figure>
+  <figure><img src="../../evidencias-laboratorio/parte-2-grafana/grafana-prometheus-latency-2026-10-31.png"><figcaption>Prometheus/Mimir · buckets de latencia HTTP.</figcaption></figure>
+  <figure><img src="../../evidencias-laboratorio/parte-2-grafana/grafana-trace-chat-span-local-2026-10-31.png"><figcaption>Tempo · traza de mensaje Socket.IO, tres spans, runtime Docker.</figcaption></figure>
+ </div>
+ <div class="accent"><b>Correlación comprobada:</b> desde Tempo se abrió la consulta de logs de la traza y Loki encontró el evento con el mismo <code>trace_id</code>. La advertencia de <code>host.id</code> no impidió exportar. Las imágenes conservan el intervalo de consulta mostrado por Grafana.</div>
+ <div class="footer"><span>Grafana Cloud · señales consultadas</span><span>8 / 12</span></div>
 </section>
 <section class="page">
  <div class="eyebrow">08 · Docker</div><h2>UNA Chat en contenedor local</h2>
@@ -137,18 +144,18 @@ a { color:#126a87; text-decoration:none; }
 <section class="page">
  <div class="eyebrow">11 · Validación y cierre</div><h2>Pruebas, reproducción y conclusión</h2>
  <h3>Suite de aplicación</h3>
- <table><tr><th>Suite (Node 24.22.1)</th><th>Resultado</th></tr><tr><td>Mocha</td><td>12 passing</td></tr><tr><td>Jest integración</td><td>5 passing</td></tr><tr><td>Playwright E2E</td><td>6 passing</td></tr><tr><td>Total</td><td><b>23/23 passing</b></td></tr></table>
-  <p>La auditoría de producción reportó 0 vulnerabilidades. La auditoría completa posterior a Mocha 12 quedó con 3 bajas y 24 moderadas, sin altas. El <code>npm ci</code> local se detuvo tras varios minutos sin progreso en Windows; Mocha aprobó 12/12 localmente. GitHub Actions ejecutó con éxito unitarias, integración, Playwright y deploy para el commit <code>0f998db</code> (run 41179912329). Tras el ajuste OTLP local, se repitieron las 23 pruebas con Node 24.22.2: 12 Mocha, 5 Jest y 6 Playwright. En Docker sí se completó <code>npm ci --omit=dev</code>.</p>
+ <table><tr><th>Suite (Node 24.22.2)</th><th>Resultado final</th></tr><tr><td>Mocha</td><td>12 passing</td></tr><tr><td>Jest integración</td><td>5 passing</td></tr><tr><td>Playwright E2E</td><td>6 passing</td></tr><tr><td>Total</td><td><b>23/23 passing</b></td></tr></table>
+  <p>La auditoría de producción reportó 0 vulnerabilidades. La auditoría completa posterior a Mocha 12 quedó con 3 bajas y 24 moderadas, sin altas. En la validación final local se ejecutaron directamente las CLI con Node 24.22.2: 12 Mocha, 5 Jest y 6 Playwright aprobadas. GitHub Actions también aprobó unitarias, integración, Playwright y deploy para el commit de entrega <code>41b898c</code> (run 41180311079). En Docker se completó <code>npm ci --omit=dev</code>.</p>
  <h3>Comandos principales</h3>
  <div class="cmd">docker compose up -d --build
 npm run test:load:socketio
 npm run test:load:http
 curl http://127.0.0.1:3000/</div>
  <h3>Conclusión</h3>
-  <p>El chat público y la ejecución local contenerizada funcionan; Artillery procesó los 300 mensajes previstos en localhost y Sentry recibió el evento controlado. Las variables temporales fueron retiradas, el commit <code>0f998db</code> quedó Ready en Vercel y Cronitor apunta a la URL asignada. La autenticación local al gateway OTLP fue aceptada; el panel Hosted Logs indicó 0 bytes y Explore permaneció cargando, por lo que no se declara recepción/consulta de datos.</p>
+  <p>El chat público y la ejecución local contenerizada funcionan; Artillery procesó los 300 mensajes previstos en localhost y Sentry recibió el evento controlado. Las variables temporales fueron retiradas, el deployment de entrega quedó Ready en Vercel y Cronitor apunta a la URL asignada. Grafana Cloud devolvió resultados consultables en Loki, Prometheus/Mimir y Tempo; el log de un mensaje Socket.IO se correlacionó con su traza mediante el mismo <code>trace_id</code>.</p>
  <h3>Anexo · índice de capturas originales</h3>
-  <p class="small">Vercel: 01-vercel-chat-funcionando; 02-vercel-dos-clientes y 09-vercel-live-chat-after-cleanup y 11-vercel-live-after-otel (commit 0f998db). GitHub Actions: 08-github-actions-cleanup-success (run 41177108139) y 12-github-actions-0f998db-success (run 41179912329). Cronitor: 03-cronitor-render-healthy; 04-cronitor-vercel-monitor-created; 05-cronitor-vercel-healthy (configuración histórica) y registro vigente 10-cronitor-vercel-final. Sentry: 06-sentry-project-no-events-yet (estado inicial) y 07-sentry-controlled-event (evento recibido, 2026-10-31). Grafana: 01-grafana-politica-otlp-scopes y registro de conexión local 02-otlp-auth-y-smoke-local. Docker: 01-chat-docker; 02-conversacion-docker-dos-clientes; 03-chat-docker-verificado; 04-recepcion-dos-clientes-docker. Registro de pruebas recientes: 05-validacion-tras-otel. Capturas originales en <code>evidencias-laboratorio/</code>.</p>
- <p class="small">Informe extendido: <code>ENTREGA-LABORATORIO.md</code>. Índice y metadatos: <code>evidencias-laboratorio/README.md</code>. Token OTLP y DSN excluidos.</p>
+  <p class="small">Vercel: 01-vercel-chat-funcionando; 02-vercel-dos-clientes; 09-vercel-live-chat-after-cleanup y 11-vercel-live-after-otel. GitHub Actions: 08 (run 41177108139), 12 (41179912329) y 13 (41180311079). Cronitor: 03, 04, 05 y registro vigente 10. Sentry: 06 estado inicial y 07 evento recibido. Grafana: `grafana-loki-logs`, `grafana-prometheus-requests`, `grafana-prometheus-latency`, `grafana-prometheus-errors`, `grafana-trace-chat-span-local` y `grafana-log-trace-correlated`; PNG y JPG originales con metadatos por archivo. Docker: 01-04 y registro de pruebas 05. Todo en <code>evidencias-laboratorio/</code>.</p>
+ <p class="small">Informe y anexos: <code>ENTREGA-LABORATORIO.md</code> y <code>evidencias-laboratorio/README.md</code>.</p>
  <div class="footer"><span>Conclusión y anexos</span><span>12 / 12</span></div>
 </section>
 </body>

@@ -1,0 +1,8 @@
+Capture date: 2026-10-31
+Service/platform: Grafana Cloud, stack earnestbus1072
+Observed service: una-chat
+Environment: local (Docker)
+Interval: Last 1 hour, as shown in Explore.
+Query: Tempo TraceQL: { resource.service.name = "una-chat" }; Evento-Mensaje-Server trace detail.
+Result: Queryable Socket.IO trace with three spans, including chat.process_message, Docker runtime, and local environment.
+Source: authentic screenshot from the authenticated integrated browser; PNG format copy from the original JPEG, with no crop or annotations. No credentials.
