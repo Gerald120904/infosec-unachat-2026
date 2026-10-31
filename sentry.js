@@ -2,7 +2,8 @@
 
 // Sentry is enabled only on the Vercel deployment and only after its DSN is
 // configured in the platform environment. Local Docker telemetry stays OTLP-only.
-var enabled = process.env.VERCEL === '1' && Boolean(process.env.SENTRY_DSN);
+var isVercel = process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production' || Boolean(process.env.VERCEL_URL);
+var enabled = isVercel && Boolean(process.env.SENTRY_DSN);
 var Sentry = enabled ? require('@sentry/node') : null;
 
 if (Sentry) {
