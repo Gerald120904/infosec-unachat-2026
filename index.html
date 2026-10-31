@@ -222,6 +222,7 @@
 
       $(function () {
         var socket = io({
+          path: '/api/socket-io/socket.io',
           transports: ['websocket'],
           reconnection: true,
           reconnectionAttempts: Infinity,

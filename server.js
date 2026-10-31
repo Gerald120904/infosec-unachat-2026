@@ -8,7 +8,9 @@ var logger = require('./logger');
 var validation = require('./libs/unalib');
 var app = require('express')();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+// Vercel Functions route the Socket.IO upgrade through an API path; the same
+// path also works locally and keeps the native Socket.IO protocol unchanged.
+var io = require('socket.io')(http, { path: '/api/socket-io/socket.io' });
 var port = process.env.PORT || 3000;
 var metrics = telemetry.metrics;
 var requests = metrics ? metrics.createCounter('http.server.requests') : null;
@@ -96,7 +98,7 @@ io.on('connection', function(socket){
       api.context.with(activeContext, function() {
         var result = processMessage(msg);
         if (messages) messages.add(1, { outcome: 'success' });
-        logger.info({ event: 'chat.message.processed', outcome: 'success' });
+        logger.info({ event: 'chat.message.processed', outcome: 'success', transport: 'socket.io' });
         io.emit('Evento-Mensaje-Server', result);
       });
     } catch (error) {
@@ -104,7 +106,7 @@ io.on('connection', function(socket){
       span.recordException(error);
       span.setStatus({ code: 2 });
       if (messages) messages.add(1, { outcome: 'error' });
-      api.context.with(activeContext, function() { logger.error({ event: 'chat.message.processed', outcome: 'error', err: error.message }); });
+      api.context.with(activeContext, function() { logger.error({ event: 'chat.message.processed', outcome: 'error', transport: 'socket.io', err: error.message }); });
     } finally {
       if (messageDuration) messageDuration.record(Number(process.hrtime.bigint() - start) / 1e6, { outcome: outcome, transport: 'socket.io' });
       span.end();

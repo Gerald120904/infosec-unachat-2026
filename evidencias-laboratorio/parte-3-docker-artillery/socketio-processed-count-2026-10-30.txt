@@ -1,0 +1,4 @@
+since=2026-10-31T04:05:50Z total_socketio_processed=300 success=300 errors=0
+2026-10-31T04:05:57.784025626Z {"level":30,"time":<redacted>,"pid":1,"hostname":"1a1e0680f7e3","trace_id":"e12e06f55eee899ba75bee319e5898cf","span_id":"1f69d24ce0e58cc3","trace_flags":"01","deployment.environment":"local","event":"chat.message.processed","outcome":"success","transport":"socket.io"}
+2026-10-31T04:05:57.832075411Z {"level":30,"time":<redacted>,"pid":1,"hostname":"1a1e0680f7e3","trace_id":"8b828f1ad10c3439c89d3524c4a82fba","span_id":"87f4f51732d2a6e3","trace_flags":"01","deployment.environment":"local","event":"chat.message.processed","outcome":"success","transport":"socket.io"}
+2026-10-31T04:05:57.882203607Z {"level":30,"time":<redacted>,"pid":1,"hostname":"1a1e0680f7e3","trace_id":"f639897459f70567cbe6c4c82dfdcd7f","span_id":"2043f58ca03a035b","trace_flags":"01","deployment.environment":"local","event":"chat.message.processed","outcome":"success","transport":"socket.io"}

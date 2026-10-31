@@ -1,0 +1,151 @@
+# npm audit report
+
+csv-parse  <7.0.2
+Severity: moderate
+node-csv: Prototype replacement still reachable via columns path - https://github.com/advisories/GHSA-8cw4-87c7-c6xx
+fix available via `npm audit fix --force`
+Will install artillery@0.0.2, which is a breaking change
+node_modules/csv-parse
+  artillery  >=1.3.2
+  Depends on vulnerable versions of @oclif/core
+  Depends on vulnerable versions of @oclif/plugin-help
+  Depends on vulnerable versions of @oclif/plugin-not-found
+  Depends on vulnerable versions of csv-parse
+  Depends on vulnerable versions of walk-sync
+  node_modules/artillery
+
+deepmerge  >=4.2.0
+deepmerge mergeObject() allows prototype poisoning of returned objects - https://github.com/advisories/GHSA-gcqx-w48m-w2h4
+fix available via `npm audit fix --force`
+Will install jest@25.1.0, which is a breaking change
+node_modules/deepmerge
+  jest-config  >=25.2.0-alpha.86
+  Depends on vulnerable versions of babel-jest
+  Depends on vulnerable versions of deepmerge
+  Depends on vulnerable versions of glob
+  Depends on vulnerable versions of jest-circus
+  Depends on vulnerable versions of jest-runner
+  node_modules/jest-config
+    @jest/core  >=25.2.0-alpha.86
+    Depends on vulnerable versions of @jest/reporters
+    Depends on vulnerable versions of @jest/transform
+    Depends on vulnerable versions of jest-config
+    Depends on vulnerable versions of jest-resolve-dependencies
+    Depends on vulnerable versions of jest-runner
+    Depends on vulnerable versions of jest-runtime
+    Depends on vulnerable versions of jest-snapshot
+    node_modules/@jest/core
+      jest  >=25.2.0-alpha.86
+      Depends on vulnerable versions of @jest/core
+      Depends on vulnerable versions of jest-cli
+      node_modules/jest
+      jest-cli  >=25.2.0-alpha.86
+      Depends on vulnerable versions of @jest/core
+      Depends on vulnerable versions of jest-config
+      node_modules/jest-cli
+
+diff  6.0.0 - 8.0.2
+jsdiff has a Denial of Service vulnerability in parsePatch and applyPatch - https://github.com/advisories/GHSA-73rr-hh4g-fpgx
+fix available via `npm audit fix --force`
+Will install mocha@12.0.3, which is a breaking change
+node_modules/diff
+  mocha  >=5.1.0
+  Depends on vulnerable versions of diff
+  Depends on vulnerable versions of glob
+  Depends on vulnerable versions of minimatch
+  Depends on vulnerable versions of serialize-javascript
+  node_modules/mocha
+
+glob  3.0.0 - 14.0.1
+Severity: moderate
+Glob: AbortSignal cancellation bypass allows post-timeout filesystem traversal - https://github.com/advisories/GHSA-3g3m-2fjr-6pw4
+Depends on vulnerable versions of minimatch
+fix available via `npm audit fix --force`
+Will install mocha@12.0.3, which is a breaking change
+node_modules/glob
+node_modules/mocha/node_modules/glob
+node_modules/test-exclude/node_modules/glob
+  @jest/reporters  >=30.0.0-alpha.1
+  Depends on vulnerable versions of @jest/transform
+  Depends on vulnerable versions of glob
+  node_modules/@jest/reporters
+  jest-runtime  >=30.0.0-alpha.1
+  Depends on vulnerable versions of @jest/globals
+  Depends on vulnerable versions of @jest/transform
+  Depends on vulnerable versions of glob
+  Depends on vulnerable versions of jest-snapshot
+  node_modules/jest-runtime
+    jest-circus  >=30.0.0-alpha.1
+    Depends on vulnerable versions of @jest/expect
+    Depends on vulnerable versions of jest-runtime
+    Depends on vulnerable versions of jest-snapshot
+    node_modules/jest-circus
+    jest-runner  >=30.0.0-alpha.1
+    Depends on vulnerable versions of @jest/transform
+    Depends on vulnerable versions of jest-runtime
+    node_modules/jest-runner
+  test-exclude  4.2.2 || >=5.0.0
+  Depends on vulnerable versions of glob
+  Depends on vulnerable versions of minimatch
+  node_modules/test-exclude
+    babel-plugin-istanbul  >=8.0.0
+    Depends on vulnerable versions of test-exclude
+    node_modules/babel-plugin-istanbul
+      @jest/transform  >=30.5.0
+      Depends on vulnerable versions of babel-plugin-istanbul
+      node_modules/@jest/transform
+        babel-jest  >=30.5.0
+        Depends on vulnerable versions of @jest/transform
+        Depends on vulnerable versions of babel-plugin-istanbul
+        node_modules/babel-jest
+        jest-snapshot  >=30.5.0
+        Depends on vulnerable versions of @jest/transform
+        node_modules/jest-snapshot
+          @jest/expect  >=30.5.0
+          Depends on vulnerable versions of jest-snapshot
+          node_modules/@jest/expect
+            @jest/globals  >=30.5.0
+            Depends on vulnerable versions of @jest/expect
+            node_modules/@jest/globals
+          jest-resolve-dependencies  >=30.5.0
+          Depends on vulnerable versions of jest-snapshot
+          node_modules/jest-resolve-dependencies
+
+minimatch  <11.0.1
+Severity: moderate
+minimatch has potential denial of service via globparts amplification - https://github.com/advisories/GHSA-g3hv-75wg-m249
+fix available via `npm audit fix --force`
+Will install mocha@12.0.3, which is a breaking change
+node_modules/matcher-collection/node_modules/minimatch
+node_modules/minimatch
+node_modules/mocha/node_modules/minimatch
+node_modules/test-exclude/node_modules/glob/node_modules/minimatch
+  @oclif/core  >=3.22.0
+  Depends on vulnerable versions of minimatch
+  node_modules/@oclif/core
+    @oclif/plugin-help  >=6.0.18
+    Depends on vulnerable versions of @oclif/core
+    node_modules/@oclif/plugin-help
+    @oclif/plugin-not-found  >=3.1.1
+    Depends on vulnerable versions of @oclif/core
+    node_modules/@oclif/plugin-not-found
+  matcher-collection  *
+  Depends on vulnerable versions of minimatch
+  node_modules/matcher-collection
+    walk-sync  >=0.2.3
+    Depends on vulnerable versions of matcher-collection
+    node_modules/walk-sync
+
+serialize-javascript  <=7.1.2
+Severity: high
+Serialize JavaScript is Vulnerable to RCE via RegExp.flags and Date.prototype.toISOString() - https://github.com/advisories/GHSA-5c6j-r48x-rmvq
+Serialize JavaScript has CPU Exhaustion Denial of Service via crafted array-like objects - https://github.com/advisories/GHSA-qj8w-gfj5-8c6v
+Serialize JavaScript: Cross-site scripting (XSS) via unescaped </script at the end of a serialized function body - https://github.com/advisories/GHSA-m5mm-p8h7-m29v
+fix available via `npm audit fix --force`
+Will install mocha@12.0.3, which is a breaking change
+node_modules/serialize-javascript
+
+29 vulnerabilities (4 low, 24 moderate, 1 high)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force

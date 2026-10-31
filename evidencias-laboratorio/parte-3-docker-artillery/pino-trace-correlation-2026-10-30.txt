@@ -1,0 +1,6 @@
+2026-10-30T22:31:49.6351479-06:00 Docker local Pino trace correlation
+chat.message.processed logs=310
+logs with trace_id=310
+logs with span_id=310
+Last two sampled message logs include both trace_id and span_id: True
+Raw chat text is not written to the evidence file.

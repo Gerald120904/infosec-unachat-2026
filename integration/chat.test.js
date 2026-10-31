@@ -6,6 +6,7 @@ var clients = [];
 function connect(port) {
   return new Promise(function (resolve, reject) {
     var socket = io('http://127.0.0.1:' + port, {
+      path: '/api/socket-io/socket.io',
       transports: ['websocket'],
       forceNew: true
     });

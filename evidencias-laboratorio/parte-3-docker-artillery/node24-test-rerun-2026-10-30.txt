@@ -1,0 +1,92 @@
+Node v24.22.2 — 2026-10-30T22:10:42.3080763-06:00
+
+> test
+> mocha --ui bdd
+
+
+
+  unalib
+    is_valid_phone
+      √ should accept a phone number with a dash
+      √ should reject a phone number that contains a letter
+    is_valid_url_image
+      √ should accept an http jpg url
+      √ should accept an http gif url
+    is_valid_yt_video
+      √ should accept a youtube watch url
+    script injection
+      when the message contains a script tag
+Es un texto!
+        √ should escape the tag so it is not executable html
+      when the username contains a script tag
+Es un texto!
+        √ should escape the username
+      when the color breaks out of the style attribute
+Es un texto!
+        √ should replace it with a safe hex color
+      when an image url uses the javascript scheme
+        √ should reject the url
+      when an image url hides a script tag
+Es un texto!
+        √ should keep the message as text and not build an image tag
+      when a youtube url hides a script tag
+        √ should reject the url and not build an iframe
+      when the message contains an onerror handler
+Es un texto!
+        √ should escape the markup
+
+
+  12 passing (40ms)
+
+
+> test:integration
+> jest
+
+{"level":30,"time":1793419865236,"pid":22788,"hostname":"N00165689","deployment.environment":"local","event":"http.request","method":"GET","route":"/","status":200,"duration_ms":31.6279}
+  console.log
+    Es un texto!
+
+      at Object.log [as validateMessage] (libs/unalib.js:127:17)
+
+{"level":30,"time":1793419865417,"pid":22788,"hostname":"N00165689","deployment.environment":"local","event":"chat.message.processed","outcome":"success","transport":"socket.io"}
+  console.log
+    Es un texto!
+
+      at Object.log [as validateMessage] (libs/unalib.js:127:17)
+
+{"level":30,"time":1793419865461,"pid":22788,"hostname":"N00165689","deployment.environment":"local","event":"chat.message.processed","outcome":"success","transport":"socket.io"}
+  console.log
+    Es una imagen!
+
+      at Object.log [as validateMessage] (libs/unalib.js:119:17)
+
+{"level":30,"time":1793419865509,"pid":22788,"hostname":"N00165689","deployment.environment":"local","event":"chat.message.processed","outcome":"success","transport":"socket.io"}
+  console.log
+    Es un video!
+
+      at Object.log [as validateMessage] (libs/unalib.js:123:17)
+
+{"level":30,"time":1793419865546,"pid":22788,"hostname":"N00165689","deployment.environment":"local","event":"chat.message.processed","outcome":"success","transport":"socket.io"}
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        7.057 s
+Ran all test suites.
+
+> test:e2e
+> playwright test --reporter=line
+
+
+Running 6 tests using 1 worker
+
+(node:10868) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/6] e2e\chat.spec.js:25:5 › Chat page › when a visitor opens the chat › should show the username, message, and send controls
+[2/6] e2e\chat.spec.js:38:5 › Chat page › when a user sends a plain message › should show the message in the chat
+[3/6] e2e\chat.spec.js:48:5 › Chat page › when a user sends a plain message › should show that message to another visitor
+[4/6] e2e\chat.spec.js:72:5 › Chat page › when a user sends a script tag › should show the script as text and not run it
+[5/6] e2e\chat.spec.js:92:5 › Chat page › when a user sends an image url › should show the image in the chat
+[6/6] e2e\chat.spec.js:105:5 › Chat page › when a user sends a youtube url › should show the embedded video
+  6 passed (44.9s)

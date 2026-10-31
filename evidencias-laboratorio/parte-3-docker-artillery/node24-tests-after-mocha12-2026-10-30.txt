@@ -1,0 +1,18 @@
+Pruebas finales después de actualizar Mocha a 12.0.3
+Fecha: 2026-10-30 (America/Costa_Rica)
+Runtime: Node.js v24.22.1 (binario del runtime Codex; Node 24.x)
+
+1) Mocha
+Comando: node node_modules/mocha/bin/mocha.js --ui bdd
+Resultado: 12 passing (136 ms), exit code 0.
+
+2) Jest integración
+Comando: node node_modules/jest/bin/jest.js --runInBand
+Resultado: 1 suite, 5 tests passing, exit code 0. Tiempo observado: 155.561 s.
+
+3) Playwright E2E
+Comando: node node_modules/@playwright/test/cli.js test
+Resultado: 6 passing, exit code 0. Tiempo observado: 52.0 s.
+
+Total: 23/23 pruebas aprobadas.
+Nota del entorno: dos intentos locales de `npm ci` con Node 24 quedaron extremadamente lentos durante la fase de reify en Windows. Interrumpí el segundo tras confirmar que los paquetes instalados permitían ejecutar y aprobar las tres suites por sus CLIs directos. No se presenta ese `npm ci` como completado. La instalación de producción `npm ci --omit=dev` quedó completada en Docker y `npm audit --omit=dev` informó 0 vulnerabilidades.

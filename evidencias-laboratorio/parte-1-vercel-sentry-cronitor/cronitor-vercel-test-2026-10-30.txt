@@ -1,0 +1,12 @@
+Evidencia: monitoreo de disponibilidad de UNA Chat en Vercel
+Fecha: 2026-10-30, 23:15 hora local de Costa Rica.
+Servicio: Cronitor, monitor `UNA Chat - Vercel`.
+URL configurada: https://infosec-unachat-2026.vercel.app
+Configuración observada: petición HTTP GET cada 5 minutos, timeout 10 s, cuatro regiones, alertas activas y lista de notificación `Default`.
+Prueba real: primer chequeo desde Frankfurt respondió HTTP 200 en 260 ms; el estado en pantalla fue `Healthy Just Now`.
+Capturas originales: 04-cronitor-vercel-monitor-created-2026-10-30.png (alta inicial) y 05-cronitor-vercel-healthy-2026-10-30.png (estado y chequeo real).
+Evidencia: monitor previo de Render
+Fecha: 2026-10-30.
+Servicio: Cronitor, monitor `UNA Chat - Render`.
+Resultado observado: Healthy, 100% uptime en 7 días, última comprobación HTTP 200 en 366 ms desde Frankfurt; alertas activas.
+Captura original: 03-cronitor-render-healthy-2026-10-30.png.

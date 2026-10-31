@@ -1,52 +1,155 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Laboratorio 6 - Gerald</title><style>
-@page { size: letter; margin: 0; }
-* { box-sizing:border-box } body { margin:0; font-family: Arial, Helvetica, sans-serif; color:#172b4d; }
-.page { width:8.5in;height:11in;padding:.62in .72in .62in .72in;page-break-after:always;position:relative;overflow:hidden;background:#fff; }
-.page:last-child {page-break-after:auto}
-h1 {font-size:30pt;line-height:1.1;margin:0 0 16pt;color:#0a3b62} h2 {font-size:21pt;color:#0b567d;margin:0 0 18pt}
-h3 {font-size:13pt;margin:14pt 0 6pt;color:#0b567d} p,li {font-size:10.5pt;line-height:1.45;color:#243b53}
-ul,ol {padding-left:20pt} .eyebrow {font-size:9pt;letter-spacing:1.6px;text-transform:uppercase;color:#14839b;font-weight:bold}
-.card {background:#eef6f8;border-left:4px solid #16a0a5;padding:10pt 13pt;margin:10pt 0;border-radius:3pt}
-.warn {background:#fff5e5;border-left-color:#e39a24}
-.ok {background:#e9f7ee;border-left-color:#38a169}
-.pending {background:#fff2f0;border-left-color:#dd5c4a}
-.kpi {display:inline-block;width:30%;padding:12pt;margin:1%;vertical-align:top;background:#edf4fa;border-radius:5pt;text-align:center}
-.kpi strong {display:block;font-size:23pt;color:#087d87}
-table {width:100%;border-collapse:collapse;margin:10pt 0;font-size:9.3pt}
-th {text-align:left;background:#e7f0f5;color:#0a3b62;padding:7pt;border-bottom:1px solid #cbd8e2}
-td {padding:7pt;border-bottom:1px solid #e0e8ef;vertical-align:top}
-code,pre {font-family:Consolas,monospace;background:#f2f5f8;color:#182b3a}
-pre {padding:9pt;font-size:8.5pt;white-space:pre-wrap;border-radius:4pt}
-.footer {position:absolute;left:.72in;right:.72in;bottom:.28in;border-top:1px solid #d8e1e8;padding-top:5pt;color:#718096;font-size:8pt;display:flex;justify-content:space-between}
-.cover {background:linear-gradient(150deg,#072c49 0%,#0b567d 56%,#0e8b91 100%);color:white;display:flex;flex-direction:column;justify-content:center}
-.cover h1 {font-size:36pt;color:white;max-width:6.2in}.cover p {color:#e8f5f8;font-size:14pt}.cover .eyebrow{color:#8ee7dd}.cover .coverbox{margin-top:40pt;border-top:1px solid #78aebc;padding-top:16pt}
-.cover .footer{color:#d6e9ed;border-color:#6e9baa}
-img.capture {width:100%;height:4.85in;object-fit:contain;border:1px solid #cbd8e2;border-radius:3pt;background:#f4f7fa}
-.small {font-size:8.5pt;color:#5c7082}.status {font-weight:bold;color:#a34d13}
-a {color:#087d87;text-decoration:none}
-</style></head><body>
-<section class="page cover"><div class="eyebrow">Seguridad Informática · Universidad Nacional</div><h1>Monitoreo de UNA Chat</h1><p>OpenTelemetry, Docker y pruebas de carga Artillery</p><div class="coverbox"><p><b>Estudiante:</b> Gerald<br><b>Entorno:</b> proyecto local en Docker Desktop<br><b>Fecha:</b> 30 de octubre de 2026</p><p class="small">Informe basado únicamente en ejecuciones y capturas comprobadas. Las integraciones externas se identifican como pendientes cuando no existe una sesión autenticada o una credencial configurada.</p></div><div class="footer"><span>Laboratorio de monitoreo</span><span>01 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Resumen ejecutivo</div><h2>Objetivo y estado de entrega</h2><p>Instrumentar UNA Chat para producir logs estructurados, métricas y trazas; ejecutarla en contenedor; validar la mensajería Socket.IO; y someter el servicio local a carga reproducible sin afectar el despliegue público.</p><div class="kpi"><strong>23</strong>pruebas repetidas: 12 Mocha + 5 Jest + 6 Playwright (Node 24.22.1)</div><div class="kpi"><strong>300</strong>mensajes Socket.IO procesados</div><div class="kpi"><strong>0</strong>vulnerabilidades runtime</div><div class="card ok"><b>Comprobado:</b> Docker Engine responde; el servicio Compose está healthy; interfaz HTTP responde 200; Socket.IO y el adaptador HTTP local procesaron los mensajes previstos.</div><div class="card pending"><b>Pendiente de autenticación externa:</b> no se afirma despliegue Vercel, monitor Cronitor, evento Sentry ni recepción en Grafana Cloud. Los paneles de esas cuentas no son accesibles desde el perfil de automatización disponible en este turno.</div><h3>Alcance y restricciones</h3><ul><li>Las cargas se dirigieron exclusivamente a <code>127.0.0.1:3000</code>.</li><li>No se detuvieron ni eliminaron contenedores ajenos.</li><li>No se añadieron secretos al repositorio ni al informe.</li></ul><div class="footer"><span>Gerald · UNA Chat</span><span>02 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 1 · arquitectura</div><h2>Aplicación y protocolo</h2><p>UNA Chat usa Express para servir <code>index.html</code> y Socket.IO sobre el servidor HTTP. Los clientes envían el evento <code>Evento-Mensaje-Server</code> con una cadena JSON que contiene <code>nombre</code>, <code>mensaje</code> y <code>color</code>. El servidor valida y escapa el contenido antes de emitir la respuesta.</p><h3>Recorrido observado</h3><pre>Browser ── HTTP GET / ──> Express
-Browser ══ Engine.IO WebSocket ══> Socket.IO
-Client ── Evento-Mensaje-Server(JSON string) ──> validateMessage
-Server ── Evento-Mensaje-Server(validated JSON) ──> connected clients</pre><div class="card"><b>Adaptación de cliente:</b> el navegador usa transporte WebSocket, reconexión automática, intervalos crecientes acotados y timeout de conexión de 10 segundos.</div><h3>Modificaciones principales</h3><ul><li><code>server.js</code>: orden de instrumentación, métricas HTTP/chat, spans y endpoint HTTP exclusivo del laboratorio local.</li><li><code>telemetry.js</code> y <code>logger.js</code>: SDK OpenTelemetry y Pino con IDs de traza/span.</li><li><code>index.html</code>: WebSocket y reconexión configurados.</li><li><code>Dockerfile</code>, Compose y Artillery: ejecución local reproducible.</li><li><code>vercel.json</code>: preparación de entrada Express y archivo estático.</li></ul><div class="footer"><span>Gerald · UNA Chat</span><span>03 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 1 · seguridad</div><h2>Dependencias y manejo de datos</h2><p>Se auditó el grafo de dependencias con npm audit. Se corrigió el conjunto de dependencias de producción mediante la reparación compatible de lockfile y se reconstruyó la imagen.</p><table><tr><th>Ámbito</th><th>Resultado comprobado</th><th>Tratamiento</th></tr><tr><td>Producción</td><td>0 vulnerabilidades reportadas tras npm audit --omit=dev</td><td>Imagen reconstruida con npm ci --omit=dev</td></tr><tr><td>Desarrollo</td><td>28 alertas: 1 alta, 24 moderadas, 3 bajas</td><td>La alta restante es serialize-javascript transitiva vía Mocha; npm solo ofrece bajar a Mocha 5.0.5, una incompatibilidad que no se aplicó</td></tr></table><p>Los logs instrumentados no incorporan contenido del chat, contraseñas o tokens. Incluyen nombre de evento, transporte, resultado, ruta, duración y contexto de trazas. Los secretos OTLP quedan en variables locales no versionadas; <code>.env.example</code> contiene valores vacíos.</p><div class="card warn"><b>Límite:</b> la auditoría de producción no representa la seguridad de las dependencias de desarrollo. El archivo JSON adjunto conserva el resultado de npm audit --omit=dev; el informe de auditoría completa se conserva por separado para revisar antes de actualizar herramientas.</div><h3>Vercel</h3><p>Se preparó la configuración de proyecto, pero no hay evidencia de un deployment público ni de que Socket.IO haya sido probado en Vercel. El endpoint <code>/__lab/message</code> está bloqueado cuando <code>VERCEL=1</code> y no forma parte de la imagen de producción.</p><div class="footer"><span>Gerald · UNA Chat</span><span>04 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 2 · OpenTelemetry</div><h2>Señales locales instrumentadas</h2><p>El bootstrap <code>telemetry.js</code> se carga antes de Express y HTTP. La auto-instrumentación captura HTTP; spans manuales envuelven el procesamiento de cada mensaje Socket.IO y del adaptador HTTP de laboratorio. Pino lee el span activo y añade <code>trace_id</code> y <code>span_id</code>.</p><table><tr><th>Señal</th><th>Instrumentación</th><th>Verificación local</th></tr><tr><td>Logs</td><td>Pino JSON + ambiente + trace/span IDs</td><td>Logs reales del contenedor archivados</td></tr><tr><td>Métricas</td><td>Contadores de solicitudes, errores y mensajes; histogramas de duración</td><td>Instrumentación en proceso; no exportada a nube aún</td></tr><tr><td>Trazas</td><td>Auto-instrumentación HTTP + spans chat.process_message</td><td>IDs correlacionados en logs; exportación remota no configurada</td></tr></table><div class="card pending"><b>Grafana Cloud:</b> el SDK permite OTLP/HTTP para los tres tipos de señal, pero no hay aún endpoint/credencial Grafana cargados. Por tanto, no se presentan capturas ni se afirma recepción remota. Para continuar se requiere completar autenticación en el navegador y configurar las variables secretas OTLP directamente en la máquina.</div><h3>Privacidad y aislamiento</h3><ul><li>Exportadores apagados si faltan endpoint y headers.</li><li>Sin exportación desde Vercel o NODE_ENV=test.</li><li>El contenedor Compose solo exportará a Grafana si sus variables OTLP se completan localmente.</li></ul><div class="footer"><span>Gerald · UNA Chat</span><span>05 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 3 · Docker</div><h2>Construcción y ejecución</h2><p>Docker Desktop respondió con Docker Engine 29.9.2, 8 CPU y 4,024,041,472 bytes de memoria anunciada por el daemon. Compose levantó solo el servicio de UNA Chat, publicado en loopback.</p><pre>docker info
-docker compose build una-chat
-docker compose up -d una-chat
-docker compose ps
-URL local: http://127.0.0.1:3000</pre><div class="card ok"><b>Estado verificado:</b> contenedor <code>fork-ger120904-una-chat-1</code> healthy, sin reinicios observados; GET / devolvió HTTP 200. La app se ejecuta con Node 24.22.2 en modo producción.</div><h3>Archivos para repetir</h3><ul><li><code>Dockerfile</code> (imagen Node 24 Alpine, dependencias de producción y healthcheck).</li><li><code>docker-compose.yml</code> (puerto loopback, ambiente local y variables OTLP vacías por defecto).</li><li><code>.env.example</code> (plantilla sin credenciales).</li><li><code>.dockerignore</code> (excluye módulos locales y evidencias del contexto de imagen).</li></ul><p>El contenedor de otra aplicación se mantuvo intacto. Build final: npm ci --omit=dev reportó 0 vulnerabilidades; GET / 200 y Socket.IO validado después del rebuild.</p><div class="footer"><span>Gerald · UNA Chat</span><span>06 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 3 · verificación en navegador</div><h2>Interfaz y conversación real</h2><p>Las capturas originales se tomaron del navegador contra el servicio local de Docker. La segunda imagen muestra dos clientes reales conectados y el broadcast Socket.IO.</p><img class="capture" src="file:///C:/Users/Estudiantes/Documents/Codex/2026-10-23/necesito-que-realices-de-principio-a/work/fork-ger120904/evidencias-laboratorio/parte-3-docker-artillery/01-chat-docker-2026-10-30.png"><p class="small">Evidencia 01 · portada del chat, local Docker, 2026-10-30. Captura PNG original conservada en evidencias-laboratorio/parte-3-docker-artillery/.</p><img class="capture" style="height:2.2in" src="file:///C:/Users/Estudiantes/Documents/Codex/2026-10-23/necesito-que-realices-de-principio-a/work/fork-ger120904/evidencias-laboratorio/parte-3-docker-artillery/02-conversacion-docker-dos-clientes-2026-10-30.png"><p class="small">Evidencia 02 · mensaje emitido y recibido en dos ventanas, mismo contenedor local.</p><div class="footer"><span>Gerald · UNA Chat</span><span>07 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 3 · Artillery Socket.IO</div><h2>300 mensajes por el protocolo real</h2><p>La prueba usó el motor integrado <code>socketio</code> de Artillery 2; no se instaló motor legado. Cada VU abre Socket.IO, envía una vez <code>Evento-Mensaje-Server</code> con JSON serializado y valida el evento de respuesta y el contenido esperado.</p><div class="kpi"><strong>300</strong>usuarios/emisiones</div><div class="kpi"><strong>5/s</strong>llegada durante 60 s</div><div class="kpi"><strong>0</strong>fallos reportados</div><table><tr><th>Medición</th><th>Resultado observado</th></tr><tr><td>Respuestas</td><td>300 de 300</td></tr><tr><td>Latencia p50</td><td>7.6 ms</td></tr><tr><td>Latencia p95</td><td>77.5 ms</td></tr><tr><td>Latencia p99</td><td>111.1 ms</td></tr><tr><td>Procesamiento verificado en logs</td><td>300 eventos chat.message.processed</td></tr></table><p>El informe bruto JSON y el YAML se adjuntan. Socket.IO no devuelve códigos HTTP por mensaje: las cifras de emisión/respuesta son eventos de aplicación, no solicitudes HTTP.</p><div class="footer"><span>Gerald · UNA Chat</span><span>08 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 3 · Artillery HTTP</div><h2>Adaptador local requerido por la guía</h2><p>Como la guía solicita medir solicitudes HTTP, se creó <code>/__lab/message</code> solo para pruebas locales. La ruta reutiliza el validador real del chat y está habilitada únicamente con <code>LAB_HTTP_TEST_ENABLED=true</code>. También comprueba Host local y origen loopback/bridge. En Vercel retorna 404.</p><div class="kpi"><strong>300</strong>POST recibidos</div><div class="kpi"><strong>200</strong>respuestas exitosas</div><div class="kpi"><strong>0</strong>fallidas</div><table><tr><th>Latencia</th><th>Valor</th></tr><tr><td>p50</td><td>7.9 ms</td></tr><tr><td>p95</td><td>64.7 ms</td></tr><tr><td>p99</td><td>671.9 ms</td></tr><tr><td>Tasa completada</td><td>5 solicitudes/s durante 60 s</td></tr></table><p>El contador independiente encontró 300 logs con <code>transport=http</code>. El p99 alto es consistente con variabilidad de recursos, no se presenta como benchmark productivo.</p><div class="card warn"><b>Condición de host:</b> un contenedor independiente de la máquina consumió en muestras entre 49 % y 270 % de CPU, con un pico previo de 975 %. Se dejó intacto como pidió el usuario; estos resultados son reproducibles en este equipo, aunque esa interferencia puede afectar colas y percentiles de cola.</div><div class="footer"><span>Gerald · UNA Chat</span><span>09 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 1 · publicación</div><h2>Preparación de Vercel</h2><p>El repositorio tiene un archivo <code>vercel.json</code> orientado al entrypoint Express y al archivo HTML. El código mantiene el servidor HTTP/Socket.IO para ofrecer WebSockets y solo llama <code>listen()</code> cuando se ejecuta como proceso local. La ruta HTTP de Artillery está excluida si <code>VERCEL=1</code>.</p><h3>Estado verificado</h3><table><tr><th>Elemento</th><th>Estado</th></tr><tr><td>Configuración local y JSON de Vercel</td><td>Preparada y parseada como JSON válido</td></tr><tr><td>Deployment público de Vercel</td><td class="status">Pendiente: cuenta no vinculada al perfil operativo de navegador</td></tr><tr><td>Conexión de Socket.IO pública</td><td class="status">No probada; no se inventa URL ni resultado</td></tr><tr><td>Monitoreo Cronitor de Vercel</td><td class="status">Depende de obtener URL pública funcional</td></tr><tr><td>Error controlado Sentry</td><td class="status">SDK Sentry preparado; falta proyecto/DSN autenticado y evento controlado</td></tr></table><p>Se respetará la restricción de no enviar carga a Vercel. Después de autenticar, la verificación debe ser manual/funcional de interfaz y Socket.IO con mensajes sintéticos de baja tasa.</p><p class="small">Docs oficiales consultables: vercel.com/docs/frameworks/backend/express; vercel.com/docs/project-configuration/vercel-json; vercel.com/changelog/websocket-support-is-now-generally-available.</p><div class="footer"><span>Gerald · UNA Chat</span><span>10 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Parte 2 · Grafana Cloud · parte 1 · Sentry · Cronitor</div><h2>Servicios externos: estado honesto</h2><table><tr><th>Servicio</th><th>Trabajo realizado</th><th>Falta para verificar</th></tr><tr><td>Grafana Cloud</td><td>SDK con exportadores OTLP de logs, métricas y trazas; Docker Compose acepta endpoint y headers por entorno.</td><td>Iniciar sesión con perfil accesible y establecer la credencial OTLP local sin compartirla por chat.</td></tr><tr><td>Sentry</td><td>SDK Node 10.78.0 integrado solo para Vercel; sin DSN no se inicializa. beforeSend elimina cuerpo, cookies, headers y query strings.</td><td>Crear/reutilizar proyecto y configurar DSN; generar un evento controlado desde Vercel y apagar la ruta temporal protegida.</td></tr><tr><td>Cronitor</td><td>Cuenta abierta en navegador compartido previamente.</td><td>Crear monitor después de que exista URL Vercel pública y verificar la notificación.</td></tr></table><div class="card warn"><b>Sin telemetría remota afirmada:</b> los registros locales y la instrumentación están comprobados. No hay captura real de un panel Grafana con esta telemetría en este estado. El informe no contiene claves, DSN, tokens ni capturas de sesión que puedan revelarlos.</div><p>Autenticación Grafana requerida mediante la página segura de acceso a perfil que se comparte con el usuario en el mensaje final. Tras iniciar sesión debe pulsarse <b>Save profile</b> y avisar en este chat.</p><div class="footer"><span>Gerald · UNA Chat</span><span>11 / 12</span></div></section>
-<section class="page"><div class="eyebrow">Reproducción y conclusión</div><h2>Entrega técnica y siguientes verificaciones</h2><h3>Comandos reproducibles</h3><pre>docker compose build una-chat
-docker compose up -d una-chat
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Laboratorio 6 - Gerald</title>
+<style>
+@page { size: Letter; margin: 0; }
+* { box-sizing: border-box; }
+body { margin: 0; color: #18312e; font: 11pt/1.45 Arial, sans-serif; background: white; }
+.page { width: 8.5in; height: 11in; padding: .62in .68in .58in; position: relative; page-break-after: always; overflow: hidden; }
+.page:last-child { page-break-after: auto; }
+h1 { font-size: 27pt; line-height: 1.1; margin: 0 0 14pt; color: #123b37; }
+h2 { font-size: 19pt; margin: 0 0 12pt; color: #123b37; }
+h3 { font-size: 12pt; margin: 14pt 0 5pt; color: #176a60; }
+p { margin: 0 0 9pt; }
+ul, ol { margin: 5pt 0 10pt 18pt; padding: 0; }
+li { margin-bottom: 5pt; }
+.eyebrow { color: #c56a1a; text-transform: uppercase; font-weight: bold; font-size: 9pt; letter-spacing: 1.1pt; }
+.lead { font-size: 14pt; color: #47635f; }
+.accent { border-left: 4px solid #e3a73a; padding: 9pt 12pt; background: #f8f5eb; margin: 10pt 0; }
+.tag { display:inline-block; padding:3pt 8pt; border-radius:10pt; background:#e4f2ed; color:#176a60; font-size:9pt; font-weight:bold; }
+.warn { background:#fff3dc; border-left-color:#d9821d; }
+.screen { width: 100%; max-height: 5.4in; object-fit: contain; border: 1px solid #ccd9d6; margin: 6pt 0; }
+.screen.short { max-height: 4.65in; }
+.caption { font-size: 9pt; color:#516c67; }
+table { width:100%; border-collapse:collapse; font-size:9.5pt; margin:8pt 0; }
+th,td { border:1px solid #b9cbc7; padding:6pt; text-align:left; vertical-align:top; }
+th { background:#e7f0ed; }
+code, .mono { font-family:Consolas,monospace; font-size:9pt; }
+.cmd { background:#193330; color:#f3f8f5; padding:9pt 11pt; border-radius:4pt; white-space:pre-wrap; margin:7pt 0 10pt; }
+.footer { position:absolute; left:.68in; right:.68in; bottom:.25in; padding-top:5pt; border-top:1px solid #cbd8d5; color:#718581; font-size:8pt; display:flex; justify-content:space-between; }
+.cover { background:linear-gradient(160deg,#eaf3ef 0%,#fffaf0 61%,#f5eee0 100%); display:flex; flex-direction:column; justify-content:center; }
+.cover h1 { font-size:34pt; max-width:6.7in; margin:14pt 0; }
+.cover .meta { margin-top:30pt; border-top:2px solid #d8a340; padding-top:12pt; width:4.9in; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:9pt; }
+.small { font-size:9pt; color:#526965; }
+a { color:#126a87; text-decoration:none; }
+</style>
+</head>
+<body>
+<section class="page cover">
+ <div class="eyebrow">Seguridad Informática · Universidad Nacional</div>
+ <h1>Laboratorio 6<br>Monitoreo de UNA Chat</h1>
+ <p class="lead">Vercel, Cronitor, Sentry, OpenTelemetry, Grafana Cloud, Docker y Artillery</p>
+ <div class="meta"><p><b>Estudiante:</b> Gerald</p><p><b>Fecha:</b> 30 de octubre de 2026</p><p><b>Repositorio:</b><br><a href="https://github.com/Gerald120904/infosec-unachat-2026">github.com/Gerald120904/infosec-unachat-2026</a></p><p><b>Estado:</b> avance verificado; pendientes explícitos en Sentry y Grafana Cloud.</p></div>
+ <div class="footer"><span>UNA Chat · Laboratorio de monitoreo</span><span>1 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">01 · Objetivo</div><h2>Objetivo y alcance</h2>
+ <p>Instrumentar y verificar UNA Chat en su despliegue público y en un entorno local contenerizado. La práctica cubre disponibilidad, captura de errores, telemetría distribuida y carga funcional a través del protocolo real del chat.</p>
+ <h3>Resultados objetivo</h3>
+ <ul><li>Publicar el fork en Vercel con Node.js 24 y verificar el intercambio de mensajes Socket.IO sobre WebSocket.</li><li>Monitorear el endpoint público con Cronitor y habilitar alertas.</li><li>Preparar Sentry para registrar errores del entorno Vercel.</li><li>Enviar logs, métricas y trazas únicamente desde la ejecución local/Docker hacia Grafana Cloud.</li><li>Comparar 300 mensajes Socket.IO y 300 solicitudes HTTP de prueba exclusivamente contra localhost.</li></ul>
+ <div class="accent"><b>Regla de alcance:</b> Artillery nunca se ejecutó contra Vercel. No se enviaron logs locales, métricas ni trazas desde el runtime público Vercel hacia Grafana Cloud.</div>
+ <h3>Estado comprobable</h3>
+ <table><tr><th>Componente</th><th>Estado</th></tr><tr><td>Vercel + Socket.IO</td><td>Operativo; dos clientes intercambiaron mensajes.</td></tr><tr><td>Cronitor</td><td>Monitor Vercel Healthy; alerta activa.</td></tr><tr><td>Sentry</td><td>Proyecto creado; evento real aún pendiente.</td></tr><tr><td>Grafana Cloud</td><td>Política OTLP limitada creada; ingestión pendiente del token local y consulta.</td></tr><tr><td>Docker + Artillery</td><td>Operativo; carga local completada.</td></tr></table>
+ <div class="footer"><span>Objetivo y alcance</span><span>2 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">02 · Arquitectura</div><h2>Aplicación e instrumentación</h2>
+ <p>UNA Chat utiliza Express para servir la interfaz y Socket.IO para recibir el evento <span class="mono">Evento-Mensaje-Server</span> y difundir el mensaje a los clientes conectados.</p>
+ <h3>Cambios implementados</h3>
+ <ul><li>Socket.IO usa la ruta <code>/api/socket-io/socket.io</code> en cliente, servidor y pruebas, con transporte WebSocket y reconexión.</li><li>OpenTelemetry se inicializa antes de Express/HTTP; se agregaron spans de mensajes y métricas HTTP/chat.</li><li>Pino produce eventos estructurados con <code>trace_id</code> y <code>span_id</code>, sin registrar el texto del chat.</li><li>Sentry Node SDK solo inicia en Vercel y requiere <code>SENTRY_DSN</code>; se desactiva el envío de PII y se filtran cookies, cabeceras y query strings.</li><li>La ruta HTTP de laboratorio <code>/__lab/message</code> solo está disponible fuera de Vercel y reutiliza el validador real.</li><li>Docker publica el servicio solamente en <code>127.0.0.1:3000</code>.</li></ul>
+ <div class="accent warn"><b>Privacidad de telemetría:</b> la configuración previene exportar desde Vercel. La entrega OTLP real desde Docker todavía requiere validar credenciales localmente en el archivo ignorado <code>.env</code>.</div>
+ <h3>Protocolo Socket.IO verificado</h3><p>El cliente envía una cadena JSON con <code>nombre</code>, <code>mensaje</code> y <code>color</code> a <code>Evento-Mensaje-Server</code>. El servidor valida el contenido y lo difunde a los clientes mediante el evento de respuesta del chat. Las pruebas validan recepción en ambos clientes.</p>
+ <div class="footer"><span>Arquitectura</span><span>3 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">03 · Vercel</div><h2>Despliegue público</h2>
+ <p>El proyecto Vercel está conectado al fork correcto y a la rama <code>master</code>. El panel mostró el deployment en estado Ready y la aplicación pública respondió correctamente.</p>
+ <p><b>URL pública:</b> <a href="https://infosec-unachat-2026.vercel.app">https://infosec-unachat-2026.vercel.app</a></p>
+ <p><b>Repositorio:</b> <a href="https://github.com/Gerald120904/infosec-unachat-2026">Gerald120904/infosec-unachat-2026</a></p>
+ <img class="screen" src="../../evidencias-laboratorio/parte-1-vercel-sentry-cronitor/01-vercel-chat-funcionando-2026-10-30.png">
+ <p class="caption">Captura original de la aplicación desde el alias de producción. La evidencia muestra el chat activo y mensajes difundidos; no se ejecutó carga contra el servicio público.</p>
+ <div class="footer"><span>Vercel · producción</span><span>4 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">04 · Socket.IO</div><h2>Conversación entre dos clientes</h2>
+ <p>Se usaron dos páginas independientes del alias público. Ambas establecieron el transporte WebSocket y recibieron los mensajes publicados en la sala.</p>
+ <img class="screen short" src="../../evidencias-laboratorio/parte-1-vercel-sentry-cronitor/02-vercel-dos-clientes-2026-10-30.png">
+ <h3>Comprobación funcional</h3>
+ <ul><li>Cliente 1 envió “Socket.IO en alias público de Vercel”.</li><li>Cliente 2 envió “Difusión real entre dos clientes públicos”.</li><li>La interfaz mostró los mensajes; se verificó el transporte WebSocket en ambos clientes.</li></ul>
+ <p class="small">Registro: <code>parte-1-vercel-sentry-cronitor/vercel-chat-test-2026-10-30.txt</code></p>
+ <div class="footer"><span>Socket.IO · WebSocket</span><span>5 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">05 · Cronitor</div><h2>Disponibilidad y notificaciones</h2>
+ <p>Se creó el monitor <b>UNA Chat - Vercel</b> para el alias público. La configuración es GET cada cinco minutos, timeout de 10 segundos, cuatro regiones y lista de notificaciones <b>Default</b>. Las alertas están habilitadas.</p>
+ <img class="screen short" src="../../evidencias-laboratorio/parte-1-vercel-sentry-cronitor/05-cronitor-vercel-healthy-2026-10-30.png">
+ <h3>Resultado observado</h3>
+ <p>Primer chequeo real: <span class="tag">Healthy</span> HTTP 200, 260 ms desde Frankfurt. Uptime inicial mostrado: 100% para el período registrado.</p>
+ <p>Monitor: <a href="https://cronitor.io/app/monitors/UTzIWf">cronitor.io/app/monitors/UTzIWf</a>. El monitor anterior de Render se conservó separado.</p>
+ <p class="caption">Las notificaciones están configuradas en Default y el control de alertas indica On. No se generó una caída artificial para probar el envío de una notificación.</p>
+ <div class="footer"><span>Cronitor · chequeo real</span><span>6 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">06 · Sentry</div><h2>Proyecto de captura de errores</h2>
+ <p>En la organización <code>gerald-aw0</code> se creó el proyecto Express <b>una-chat-vercel</b>. El código de la aplicación inicializa Sentry en Vercel con el SDK Node; la captura de PII está desactivada.</p>
+ <img class="screen short" src="../../evidencias-laboratorio/parte-1-vercel-sentry-cronitor/06-sentry-project-no-events-yet-2026-10-30.png">
+ <div class="accent warn"><b>Estado pendiente:</b> la vista real de Issues aún muestra el onboarding sin eventos. Falta configurar <code>SENTRY_DSN</code> como variable secreta en Vercel, generar el error controlado protegido y verificar el evento. Por tanto, no se afirma recepción de errores.</div>
+ <p>La evidencia no incluye DSN, claves ni datos de usuario. El mecanismo de prueba está protegido por secreto y debe apagarse tras validar el evento.</p>
+ <div class="footer"><span>Sentry · estado verificado</span><span>7 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">07 · Grafana Cloud</div><h2>Permisos OTLP y señales</h2>
+ <p>Se configuró la política <code>una-chat-local-otel-write</code> en la organización Grafana. Sus únicos permisos son <code>logs:write</code>, <code>metrics:write</code> y <code>traces:write</code>.</p>
+ <img class="screen short" src="../../evidencias-laboratorio/parte-2-grafana/01-grafana-politica-otlp-scopes-2026-10-30.png">
+ <h3>Separación por entorno</h3>
+ <ul><li>El endpoint OTLP se usa desde el proceso local/Docker.</li><li>La imagen construye el encabezado de autorización desde <code>GRAFANA_CLOUD_OTLP_TOKEN</code> y descarta la variable en el arranque.</li><li>La configuración impide exportar telemetría cuando se ejecuta bajo Vercel.</li></ul>
+ <div class="accent warn"><b>Pendiente:</b> validar la credencial dentro del <code>.env</code> ignorado por Git y consultar realmente logs, métricas y trazas en Grafana Cloud. La captura demuestra permisos, no ingestión.</div>
+ <div class="footer"><span>Grafana Cloud · scopes configurados</span><span>8 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">08 · Docker</div><h2>UNA Chat en contenedor local</h2>
+ <p>Docker Engine 29.9.2 respondió a <code>docker info</code> y <code>docker version</code>. El servicio de Compose quedó Healthy en <code>127.0.0.1:3000</code>, sin detener ni modificar contenedores de otros proyectos.</p>
+ <img class="screen short" src="../../evidencias-laboratorio/parte-3-docker-artillery/03-chat-docker-verificado-2026-10-30.png">
+ <h3>Pruebas locales</h3>
+ <ul><li>GET <code>http://127.0.0.1:3000/</code> → HTTP 200.</li><li>Node.js 24.x dentro del contenedor.</li><li>Socket.IO difundió mensajes entre dos clientes locales.</li><li>Logs Pino generaron <code>trace_id</code> y <code>span_id</code> para los mensajes; se omitió el texto del chat.</li></ul>
+ <p class="small">Configuración reproducible: <code>Dockerfile</code>, <code>docker-compose.yml</code> y <code>docker-entrypoint.sh</code>.</p>
+ <div class="footer"><span>Docker Compose · localhost</span><span>9 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">09 · Prueba funcional</div><h2>Dos clientes dentro de Docker</h2>
+ <p>La prueba funcional conectó dos páginas al chat de localhost. Un cliente publicó el mensaje mediante el evento Socket.IO real y el otro lo recibió.</p>
+ <img class="screen short" src="../../evidencias-laboratorio/parte-3-docker-artillery/04-recepcion-dos-clientes-docker-2026-10-30.png">
+ <h3>Observación de carga externa del equipo</h3>
+ <p>El equipo también mantenía activo el contenedor ajeno <code>respondent-community-respondent-1</code>. Se dejó sin cambios. El uso de CPU varió durante la sesión, por lo que los percentiles deben interpretarse como medición del entorno de laboratorio, no como benchmark aislado de hardware.</p>
+ <div class="footer"><span>Docker · difusión Socket.IO local</span><span>10 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">10 · Artillery</div><h2>Carga local: 5 usuarios por segundo</h2>
+ <p>Artillery 2 usó su motor nativo <code>socketio</code> durante 60 s con <code>arrivalRate: 5</code>, un mensaje por usuario virtual. Se contaron los mensajes procesados por logs de servidor.</p>
+ <table><tr><th>Métrica</th><th>Socket.IO</th><th>HTTP local</th></tr><tr><td>Duración / tasa</td><td>60 s / 5 VU/s</td><td>60 s / 5 VU/s</td></tr><tr><td>Solicitudes previstas</td><td>300 mensajes</td><td>300 POST</td></tr><tr><td>Procesadas / respuestas</td><td>300 procesados</td><td>300 HTTP 200</td></tr><tr><td>Errores</td><td>0</td><td>0</td></tr><tr><td>p50</td><td>3.7 ms</td><td>4.0 ms</td></tr><tr><td>p95</td><td>17.3 ms</td><td>8.9 ms</td></tr><tr><td>p99</td><td>29.1 ms</td><td>22.9 ms</td></tr></table>
+ <p>Socket.IO: 300 mensajes emitidos, 300 procesados con <code>outcome=success</code>, 0 VUs fallidos. HTTP: adaptador local-only <code>/__lab/message</code>, 300 respuestas 200. No se inventaron códigos HTTP para eventos Socket.IO.</p>
+ <p><b>Lugar de ejecución:</b> solo <code>http://127.0.0.1:3000</code>. Reportes en <code>artillery-socketio-retest-2026-10-30.txt</code> y <code>artillery-http-retest-path-2026-10-30.txt</code>.</p>
+ <div class="footer"><span>Artillery · localhost</span><span>11 / 12</span></div>
+</section>
+<section class="page">
+ <div class="eyebrow">11 · Validación y cierre</div><h2>Pruebas, reproducción y conclusión</h2>
+ <h3>Suite de aplicación</h3>
+ <table><tr><th>Suite (Node 24.22.1)</th><th>Resultado</th></tr><tr><td>Mocha</td><td>12 passing</td></tr><tr><td>Jest integración</td><td>5 passing</td></tr><tr><td>Playwright E2E</td><td>6 passing</td></tr><tr><td>Total</td><td><b>23/23 passing</b></td></tr></table>
+ <p>La auditoría de producción reportó 0 vulnerabilidades. La auditoría completa posterior a Mocha 12 quedó con 3 bajas y 24 moderadas, sin altas. La instalación local completa de npm quedó lenta en Windows; en Docker sí se completó <code>npm ci --omit=dev</code>.</p>
+ <h3>Comandos principales</h3>
+ <div class="cmd">docker compose up -d --build
 npm run test:load:socketio
 npm run test:load:http
-docker compose logs --no-color una-chat</pre><h3>Evidencias</h3><ul><li>PNG originales de UI y dos ventanas bajo <code>evidencias-laboratorio/parte-3-docker-artillery/</code>.</li><li>JSON de resultados Artillery Socket.IO y HTTP; YAMLs de prueba.</li><li>Logs Pino del contenedor, verificación Docker y auditoría de dependencias de producción.</li></ul><h3>Conclusión</h3><p>La parte local del laboratorio queda implementada y medida: la imagen Docker está saludable y el protocolo real produjo las 300 respuestas esperadas; el adaptador HTTP local produjo 300/300 respuestas correctas. La operación completa en nube sigue abierta. Vercel, Cronitor, Sentry y Grafana Cloud no se declaran terminados sin publicar/autenticar, configurar credenciales y comprobar paneles/eventos reales.</p><div class="card"><b>Limitación documental:</b> no se incluyen resultados externos no observados ni se afirma cumplir aquellas partes del laboratorio que dependen de autenticación o URL pública.</div><div class="footer"><span>Gerald · UNA Chat</span><span>12 / 12</span></div></section>
-</body></html>
-
+curl http://127.0.0.1:3000/</div>
+ <h3>Conclusión</h3>
+ <p>El chat público y la ejecución local contenerizada funcionan; Cronitor registra la disponibilidad y Artillery procesó los 300 mensajes previstos. Para cerrar todas las partes académicas aún deben completarse el evento de Sentry desde Vercel y la recepción/consulta de las tres señales en Grafana Cloud.</p>
+ <h3>Anexo · índice de capturas originales</h3>
+ <p class="small">Vercel: 01-vercel-chat-funcionando; 02-vercel-dos-clientes. Cronitor: 03-cronitor-render-healthy; 04-cronitor-vercel-monitor-created; 05-cronitor-vercel-healthy. Sentry: 06-sentry-project-no-events-yet. Grafana: 01-grafana-politica-otlp-scopes. Docker: 01-chat-docker; 02-conversacion-docker-dos-clientes; 03-chat-docker-verificado; 04-recepcion-dos-clientes-docker. Todas llevan fecha 2026-10-30 y están en <code>evidencias-laboratorio/</code>.</p>
+ <p class="small">Informe extendido: <code>ENTREGA-LABORATORIO.md</code>. Índice y metadatos: <code>evidencias-laboratorio/README.md</code>. Token OTLP y DSN excluidos.</p>
+ <div class="footer"><span>Conclusión y anexos</span><span>12 / 12</span></div>
+</section>
+</body>
+</html>

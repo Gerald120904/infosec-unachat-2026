@@ -1,0 +1,7 @@
+Evidencia: proyecto de errores Sentry
+Fecha: 2026-10-30.
+Servicio: Sentry, organización `gerald-aw0`, proyecto `una-chat-vercel` (Express).
+Resultado observado: el Issues Feed muestra la guía de instalación y el estado sin eventos reales.
+Captura: 06-sentry-project-no-events-yet-2026-10-30.png.
+Límite: el proyecto está creado, pero falta configurar su DSN en Vercel; no se afirma que se haya recibido un error controlado.
+Seguridad: el DSN no aparece en esta captura ni en el archivo.

@@ -4,6 +4,7 @@ config:
     - duration: 60
       arrivalRate: 5
   socketio:
+    path: /api/socket-io/socket.io
     transports: [websocket]
 scenarios:
   - name: UNA Chat Socket.IO message exchange

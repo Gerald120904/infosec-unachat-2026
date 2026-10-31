@@ -1,0 +1,7 @@
+Evidencia: Parte 1 — Vercel
+Fecha de captura: 2026-10-30 22:50–22:51 (America/Costa_Rica)
+Entorno: navegador integrado; producción Vercel, alias infosec-unachat-2026.vercel.app.
+Prueba: dos páginas independientes del chat establecieron Socket.IO con transporte WebSocket. Se enviaron «Socket.IO en alias público de Vercel» y «Difusión real entre dos clientes públicos»; la interfaz autenticada por ambas páginas mostró la difusión.
+Resultado: interfaz cargada, transporte WebSocket conectado y mensajes visibles. Las imágenes PNG son capturas originales sin edición.
+Archivos: 01-vercel-chat-funcionando-2026-10-30.png; 02-vercel-dos-clientes-2026-10-30.png.
+Límite: esta prueba es funcional; no es prueba de carga.
