@@ -1,0 +1,7 @@
+Fecha: 2026-10-31 (Costa Rica)
+Servicio: Vercel Production, UNA Chat
+URL: https://infosec-unachat-2026-black.vercel.app
+Revisión: despliegue del commit c411341, listo. GET / respondió HTTP 200.
+Prueba funcional: cliente Playwright conectado por Socket.IO/WebSocket en /api/socket-io/socket.io, envió un mensaje de verificación y recibió la difusión en la misma sesión; una prueba separada por socket.io-client también confirmó la respuesta del evento Evento-Mensaje-Server.
+Resultado: mensaje de smoke test aparece en el chat público.
+Privacidad: no se muestra ningún token; la prueba fue un único mensaje, no una prueba de carga.

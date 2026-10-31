@@ -42,7 +42,7 @@ a { color:#126a87; text-decoration:none; }
  <div class="eyebrow">Seguridad Informática · Universidad Nacional</div>
  <h1>Laboratorio 6<br>Monitoreo de UNA Chat</h1>
  <p class="lead">Vercel, Cronitor, Sentry, OpenTelemetry, Grafana Cloud, Docker y Artillery</p>
- <div class="meta"><p><b>Estudiante:</b> Gerald</p><p><b>Fecha:</b> 31 de octubre de 2026</p><p><b>Repositorio:</b><br><a href="https://github.com/Gerald120904/infosec-unachat-2026">github.com/Gerald120904/infosec-unachat-2026</a></p><p><b>Estado:</b> avance verificado; Sentry recibió un evento real. Limpieza de variables temporales y Grafana Cloud siguen pendientes.</p></div>
+  <div class="meta"><p><b>Estudiante:</b> Gerald</p><p><b>Fecha:</b> 31 de octubre de 2026</p><p><b>Repositorio:</b><br><a href="https://github.com/Gerald120904/infosec-unachat-2026">github.com/Gerald120904/infosec-unachat-2026</a></p><p><b>Estado:</b> Sentry recibió un evento real; variables temporales retiradas. Grafana Cloud sigue pendiente de ingestión.</p></div>
  <div class="footer"><span>UNA Chat · Laboratorio de monitoreo</span><span>1 / 12</span></div>
 </section>
 <section class="page">
@@ -52,7 +52,7 @@ a { color:#126a87; text-decoration:none; }
  <ul><li>Publicar el fork en Vercel con Node.js 24 y verificar el intercambio de mensajes Socket.IO sobre WebSocket.</li><li>Monitorear el endpoint público con Cronitor y habilitar alertas.</li><li>Preparar Sentry para registrar errores del entorno Vercel.</li><li>Enviar logs, métricas y trazas únicamente desde la ejecución local/Docker hacia Grafana Cloud.</li><li>Comparar 300 mensajes Socket.IO y 300 solicitudes HTTP de prueba exclusivamente contra localhost.</li></ul>
  <div class="accent"><b>Regla de alcance:</b> Artillery nunca se ejecutó contra Vercel. No se enviaron logs locales, métricas ni trazas desde el runtime público Vercel hacia Grafana Cloud.</div>
  <h3>Estado comprobable</h3>
- <table><tr><th>Componente</th><th>Estado</th></tr><tr><td>Vercel + Socket.IO</td><td>Operativo; dos clientes intercambiaron mensajes.</td></tr><tr><td>Cronitor</td><td>Monitor creado; URL necesita validarse contra el dominio asignado actual.</td></tr><tr><td>Sentry</td><td>Error controlado recibido en Production; 1 evento.</td></tr><tr><td>Grafana Cloud</td><td>Política OTLP limitada creada; ingestión pendiente de una credencial local segura y consulta.</td></tr><tr><td>Docker + Artillery</td><td>Operativo; carga local completada.</td></tr></table>
+  <table><tr><th>Componente</th><th>Estado</th></tr><tr><td>Vercel + Socket.IO</td><td>Commit c411341 Ready; dos clientes y smoke test intercambiaron mensajes.</td></tr><tr><td>Cronitor</td><td>URL asignada; Healthy, alertas activas.</td></tr><tr><td>Sentry</td><td>Error controlado recibido en Production; variables temporales retiradas.</td></tr><tr><td>Grafana Cloud</td><td>Política OTLP limitada creada; ingestión pendiente de consulta.</td></tr><tr><td>Docker + Artillery</td><td>Operativo; carga local completada.</td></tr></table>
  <div class="footer"><span>Objetivo y alcance</span><span>2 / 12</span></div>
 </section>
 <section class="page">
@@ -69,8 +69,8 @@ a { color:#126a87; text-decoration:none; }
  <p>El proyecto Vercel está conectado al fork correcto y a la rama <code>master</code>. El panel mostró el deployment en estado Ready y la aplicación pública respondió correctamente.</p>
  <p><b>URL pública asignada:</b> <a href="https://infosec-unachat-2026-black.vercel.app">https://infosec-unachat-2026-black.vercel.app</a></p>
  <p><b>Repositorio:</b> <a href="https://github.com/Gerald120904/infosec-unachat-2026">Gerald120904/infosec-unachat-2026</a></p>
- <img class="screen" src="../../evidencias-laboratorio/parte-1-vercel-sentry-cronitor/01-vercel-chat-funcionando-2026-10-30.png">
- <p class="caption">Captura original de la aplicación desde el alias de producción. La evidencia muestra el chat activo y mensajes difundidos; no se ejecutó carga contra el servicio público.</p>
+  <img class="screen" src="../../evidencias-laboratorio/parte-1-vercel-sentry-cronitor/09-vercel-live-chat-after-cleanup-2026-10-31.png">
+  <p class="caption">Captura Playwright original de la URL asignada tras el despliegue c411341. Un mensaje enviado por Socket.IO aparece en la interfaz; solo se hizo una comprobación funcional, sin carga contra producción.</p>
  <div class="footer"><span>Vercel · producción</span><span>4 / 12</span></div>
 </section>
 <section class="page">
@@ -84,20 +84,20 @@ a { color:#126a87; text-decoration:none; }
 </section>
 <section class="page">
  <div class="eyebrow">05 · Cronitor</div><h2>Disponibilidad y notificaciones</h2>
- <p>Se creó el monitor <b>UNA Chat - Vercel</b> para el alias público. La configuración es GET cada cinco minutos, timeout de 10 segundos, cuatro regiones y lista de notificaciones <b>Default</b>. Las alertas están habilitadas.</p>
+  <p>Se creó el monitor <b>UNA Chat - Vercel</b> para el alias público. La configuración es GET cada cinco minutos, timeout de 10 segundos, cuatro regiones y lista <b>Default</b>. Las alertas están habilitadas. El 31 de octubre se actualizó el endpoint a la URL asignada de producción.</p>
  <img class="screen short" src="../../evidencias-laboratorio/parte-1-vercel-sentry-cronitor/05-cronitor-vercel-healthy-2026-10-30.png">
  <h3>Resultado observado</h3>
  <p>Primer chequeo real: <span class="tag">Healthy</span> HTTP 200, 260 ms desde Frankfurt. Uptime inicial mostrado: 100% para el período registrado.</p>
  <p>Monitor: <a href="https://cronitor.io/app/monitors/UTzIWf">cronitor.io/app/monitors/UTzIWf</a>. El monitor anterior de Render se conservó separado.</p>
- <p class="caption">Las notificaciones están configuradas en Default y el control de alertas indica On. No se generó una caída artificial para probar el envío de una notificación.</p>
+  <p class="caption">La captura es del estado saludable inicial: 200 OK, 260 ms, alertas activas. El 31 de octubre el endpoint se actualizó a la URL asignada <code>infosec-unachat-2026-black.vercel.app</code>. La vista vigente mostró Healthy, 100% de uptime en 24 horas, promedio 341 ms, 19 chequeos y 0 alertas. Estado actual en <code>10-cronitor-vercel-final-2026-10-31.txt</code>; no se generó una caída artificial.</p>
  <div class="footer"><span>Cronitor · chequeo real</span><span>6 / 12</span></div>
 </section>
 <section class="page">
  <div class="eyebrow">06 · Sentry</div><h2>Proyecto de captura de errores</h2>
- <p>En la organización <code>gerald-aw0</code> se creó el proyecto Express <b>una-chat-vercel</b>. El SDK Node se inicializa en Vercel; la captura de PII está desactivada. La variable <code>SENTRY_DSN</code> quedó configurada en el entorno Production.</p>
+  <p>En la organización <code>gerald-aw0</code> se creó el proyecto Express <b>una-chat-vercel</b>. El SDK Node se inicializa en Vercel; la captura de PII está desactivada. <code>SENTRY_DSN</code> es la única variable de aplicación que permanece en Production.</p>
  <img class="screen short" src="../../evidencias-laboratorio/parte-1-vercel-sentry-cronitor/07-sentry-controlled-event-2026-10-31.jpg">
  <div class="accent"><b>Resultado real:</b> Sentry recibió desde Vercel Production el error de verificación; el Feed mostró un evento con conteo 1. La captura original se tomó el 31 de octubre de 2026.</div>
- <p>La ruta temporal ya se eliminó del código fuente. Falta quitar sus variables temporales del panel Vercel y desplegar esa limpieza. La evidencia no incluye DSN, claves ni datos de usuario.</p>
+  <p>La ruta temporal y las variables <code>SENTRY_LAB_TEST_ENABLED</code> y <code>SENTRY_LAB_TEST_SECRET</code> se retiraron. El deployment de producción quedó Ready y la ruta ya responde 404. La evidencia no incluye DSN, claves ni datos de usuario.</p>
  <div class="footer"><span>Sentry · estado verificado</span><span>7 / 12</span></div>
 </section>
 <section class="page">
@@ -138,16 +138,16 @@ a { color:#126a87; text-decoration:none; }
  <div class="eyebrow">11 · Validación y cierre</div><h2>Pruebas, reproducción y conclusión</h2>
  <h3>Suite de aplicación</h3>
  <table><tr><th>Suite (Node 24.22.1)</th><th>Resultado</th></tr><tr><td>Mocha</td><td>12 passing</td></tr><tr><td>Jest integración</td><td>5 passing</td></tr><tr><td>Playwright E2E</td><td>6 passing</td></tr><tr><td>Total</td><td><b>23/23 passing</b></td></tr></table>
- <p>La auditoría de producción reportó 0 vulnerabilidades. La auditoría completa posterior a Mocha 12 quedó con 3 bajas y 24 moderadas, sin altas. La instalación local completa de npm quedó lenta en Windows; en Docker sí se completó <code>npm ci --omit=dev</code>.</p>
+  <p>La auditoría de producción reportó 0 vulnerabilidades. La auditoría completa posterior a Mocha 12 quedó con 3 bajas y 24 moderadas, sin altas. El <code>npm ci</code> local se detuvo tras varios minutos sin progreso en Windows; Mocha aprobó 12/12 localmente. GitHub Actions ejecutó con éxito unitarias, integración, Playwright y deploy para el commit <code>c411341</code>. Tras el ajuste OTLP local, se repitieron las 23 pruebas con Node 24.22.2: 12 Mocha, 5 Jest y 6 Playwright. En Docker sí se completó <code>npm ci --omit=dev</code>.</p>
  <h3>Comandos principales</h3>
  <div class="cmd">docker compose up -d --build
 npm run test:load:socketio
 npm run test:load:http
 curl http://127.0.0.1:3000/</div>
  <h3>Conclusión</h3>
- <p>El chat público y la ejecución local contenerizada funcionan; Artillery procesó los 300 mensajes previstos en localhost y Sentry recibió el evento controlado. Queda verificar Cronitor contra el alias asignado de Vercel, retirar variables de prueba en Vercel y validar la recepción/consulta de logs, métricas y trazas en Grafana Cloud.</p>
+  <p>El chat público y la ejecución local contenerizada funcionan; Artillery procesó los 300 mensajes previstos en localhost y Sentry recibió el evento controlado. Las variables temporales fueron retiradas, el commit <code>c411341</code> quedó Ready en Vercel y Cronitor apunta a la URL asignada. La autenticación local al gateway OTLP fue aceptada; el panel Hosted Logs indicó 0 bytes y Explore permaneció cargando, por lo que no se declara recepción/consulta de datos.</p>
  <h3>Anexo · índice de capturas originales</h3>
- <p class="small">Vercel: 01-vercel-chat-funcionando; 02-vercel-dos-clientes. Cronitor: 03-cronitor-render-healthy; 04-cronitor-vercel-monitor-created; 05-cronitor-vercel-healthy. Sentry: 06-sentry-project-no-events-yet (estado inicial) y 07-sentry-controlled-event (evento recibido, 2026-10-31). Grafana: 01-grafana-politica-otlp-scopes. Docker: 01-chat-docker; 02-conversacion-docker-dos-clientes; 03-chat-docker-verificado; 04-recepcion-dos-clientes-docker. Las capturas originales están en <code>evidencias-laboratorio/</code>.</p>
+  <p class="small">Vercel: 01-vercel-chat-funcionando; 02-vercel-dos-clientes y 09-vercel-live-chat-after-cleanup. GitHub Actions: 08-github-actions-cleanup-success (run 41177108139). Cronitor: 03-cronitor-render-healthy; 04-cronitor-vercel-monitor-created; 05-cronitor-vercel-healthy (configuración histórica) y registro vigente 10-cronitor-vercel-final. Sentry: 06-sentry-project-no-events-yet (estado inicial) y 07-sentry-controlled-event (evento recibido, 2026-10-31). Grafana: 01-grafana-politica-otlp-scopes y registro de conexión local 02-otlp-auth-y-smoke-local. Docker: 01-chat-docker; 02-conversacion-docker-dos-clientes; 03-chat-docker-verificado; 04-recepcion-dos-clientes-docker. Registro de pruebas recientes: 05-validacion-tras-otel. Capturas originales en <code>evidencias-laboratorio/</code>.</p>
  <p class="small">Informe extendido: <code>ENTREGA-LABORATORIO.md</code>. Índice y metadatos: <code>evidencias-laboratorio/README.md</code>. Token OTLP y DSN excluidos.</p>
  <div class="footer"><span>Conclusión y anexos</span><span>12 / 12</span></div>
 </section>

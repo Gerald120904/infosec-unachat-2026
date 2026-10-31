@@ -2,6 +2,13 @@
 const { trace, metrics } = require('@opentelemetry/api');
 const { NodeSDK } = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+// Accept either the standard OTLP headers value or the local-only Grafana token
+// pair. Never construct this authentication header in Vercel or test processes.
+const localGrafanaAuth = process.env.NODE_ENV !== 'vercel' && process.env.VERCEL !== '1' && process.env.NODE_ENV !== 'test';
+if (localGrafanaAuth && !process.env.OTEL_EXPORTER_OTLP_HEADERS && process.env.GRAFANA_CLOUD_OTLP_INSTANCE_ID && process.env.GRAFANA_CLOUD_OTLP_TOKEN) {
+  const basic = Buffer.from(`${process.env.GRAFANA_CLOUD_OTLP_INSTANCE_ID}:${process.env.GRAFANA_CLOUD_OTLP_TOKEN}`).toString('base64');
+  process.env.OTEL_EXPORTER_OTLP_HEADERS = `Authorization=Basic ${basic}`;
+}
 const enabled = Boolean(process.env.OTEL_EXPORTER_OTLP_ENDPOINT && process.env.OTEL_EXPORTER_OTLP_HEADERS);
 let sdk;
 if (process.env.NODE_ENV !== 'vercel' && process.env.NODE_ENV !== 'test') {

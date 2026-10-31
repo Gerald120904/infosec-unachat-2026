@@ -1,0 +1,8 @@
+Fecha: 2026-10-31 (Costa Rica), comprobado tras actualizar el monitor
+Servicio: Cronitor, UNA Chat - Vercel (producción)
+URL monitoreada: https://infosec-unachat-2026-black.vercel.app
+Configuración visible: HTTP GET cada 5 minutos; timeout 10 s; cuatro regiones; alertas On; notificación Default.
+Resultado en el panel: Healthy Just Now, uptime 100% durante 24 h, promedio 341 ms, 19 chequeos y 0 alertas.
+Últimos chequeos mostrados: HTTP 200 OK, 319 ms (California, 06:43:41 UTC) y 440 ms (Frankfurt, 06:41:35 UTC).
+Monitor: https://cronitor.io/app/monitors/UTzIWf
+Nota de imagen: 05-cronitor-vercel-healthy-2026-10-30.png es la captura original del estado inicial y muestra el alias previo. La URL actual se comprobó en la sesión real de Cronitor y se describe aquí; no se atribuye a esa imagen el estado actualizado.

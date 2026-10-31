@@ -1,0 +1,14 @@
+Fecha: 2026-10-31 01:04:11 -06:00
+Entorno: Windows host + Docker Compose local; Grafana Cloud stack earnestbus1072
+Prueba: cierre de configuración OTLP y smoke test de UNA Chat
+
+Docker Engine: 29.9.2; imagen fork-ger120904-una-chat construida correctamente.
+Contenedor fork-ger120904-una-chat-1: healthy; publicación 127.0.0.1:3000.
+GET http://127.0.0.1:3000/: HTTP 200.
+Socket.IO: conectado por WebSocket en /api/socket-io/socket.io; Evento-Mensaje-Server emitido y respuesta recibida.
+Log Docker: chat.message.processed outcome=success transport=socket.io; Pino registró trace_id y span_id sin almacenar el texto del mensaje.
+Proceso Node del contenedor: endpoint OTLP y header de autenticación presentes; variable token no está en el entorno del proceso Node (el entrypoint la elimina tras formar Basic auth).
+Prueba de autenticación al gateway Grafana OTLP: la combinación local del stack/credencial recibió HTTP 200 (cuerpo vacío, sin ingerir un evento); identificadores incorrectos respondieron 401. No se escribió ningún secreto en este archivo.
+Protección Vercel: carga de telemetry.js con VERCEL=1 dio enabled=false y no creó OTEL_EXPORTER_OTLP_HEADERS.
+
+Límite de verificación: la pantalla Grafana Hosted Logs mostró Ingest Rate: 0 bytes durante esta comprobación y Explore permaneció en estado de carga. Por ello, esta prueba demuestra autenticación y exportadores configurados, pero NO confirma todavía que Grafana haya indexado logs, métricas o trazas consultables. No se conserva captura de esa pantalla.

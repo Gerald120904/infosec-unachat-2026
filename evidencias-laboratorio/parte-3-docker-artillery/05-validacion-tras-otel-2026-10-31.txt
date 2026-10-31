@@ -1,0 +1,17 @@
+Fecha: 2026-10-31 01:14:30 -06:00
+Entorno de pruebas: Node.js 24.22.2 en Windows; Docker Engine 29.9.2; GitHub Actions Node 24
+
+Suite local después del ajuste OTLP:
+- Mocha: 12 passing.
+- Jest integración: 5 tests, 1 suite passed.
+- Playwright E2E CI headless: 6 passed (1.2m).
+Resultado combinado: 23 pruebas aprobadas.
+
+Docker:
+- docker compose build --progress plain: imagen construida; npm ci --omit=dev auditó 262 paquetes con 0 vulnerabilidades.
+- docker compose ps: fork-ger120904-una-chat-1 healthy, enlace 127.0.0.1:3000.
+- GET /: HTTP 200.
+- Socket.IO sobre WebSocket path /api/socket-io/socket.io: evento Evento-Mensaje-Server respondió correctamente.
+- Los logs del mensaje contienen trace_id y span_id; no aparece el texto del mensaje.
+
+No incluye secretos. La evidencia de la autenticación del gateway y su estado limitado de consulta está en parte-2-grafana/02-otlp-auth-y-smoke-local-2026-10-31.txt.
