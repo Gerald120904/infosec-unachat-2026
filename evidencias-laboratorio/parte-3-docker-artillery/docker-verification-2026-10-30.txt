@@ -1,0 +1,12 @@
+CORRECCION DE SECUENCIA — 2026-10-30
+Este archivo conserva la comprobacion inicial previa a carga y la frase 'Load test withheld' describe solo ese momento inicial. Luego se revisaron recursos nuevamente y se ejecutaron ambas pruebas locales; resultados definitivos: 300/300 mensajes Socket.IO y 300/300 POST HTTP 200. Ver artillery-results-2026-10-30.txt, docker-final-verification-2026-10-30.txt y los informes JSON. El contenedor ajeno respondent siguio activo durante todo el proceso.
+
+--- Registro inicial (sin editar) ---
+Fecha: 2026-10-30 (America/Costa_Rica)
+Entorno: Docker Desktop local; Compose service una-chat; http://127.0.0.1:3000
+API: Docker client/server 29.9.2; daemon responded; 8 CPUs; 4,024,041,472 bytes memory.
+Container: fork-ger120904-una-chat-1 Up; image fork-ger120904-una-chat.
+Checks: GET / returned 200 (6996 bytes); Socket.IO websocket exchanged Evento-Mensaje-Server and returned escaped/validated JSON (exact valid test message matched); POST /__lab/message returned 200; browser two-client broadcast test passed.
+Resource gate before load: respondent-community-respondent-1 used 753.08% CPU and 789 MiB; respondent-community-cyberattack-proxy-1 used 23.41%. Both unrelated containers preserved. Load test withheld because CPU contention invalidates representative latency/rate measurements.
+Capture references: 01-chat-docker-2026-10-30.png (UI); 02-conversacion-docker-dos-clientes-2026-10-30.png (real browser broadcast).
+

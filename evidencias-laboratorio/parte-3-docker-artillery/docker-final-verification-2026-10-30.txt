@@ -1,0 +1,8 @@
+Final validation — 2026-10-30 (America/Costa_Rica)
+Docker: Docker Engine 29.9.2; CPUs 8; RAM bytes 4024041472
+Compose: fork-ger120904-una-chat-1 running healthy port=3000
+GET /: HTTP 200, 7220 bytes
+vercel.json: valid JSON
+npm audit --omit=dev: 0 production vulnerabilities
+Load results: 300/300 Socket.IO messages processed; 300/300 local HTTP requests HTTP 200; see artillery-results-2026-10-30.txt and raw JSON reports.
+The separate respondent-community containers were left untouched.

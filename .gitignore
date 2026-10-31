@@ -19,6 +19,7 @@ coverage/
 test-results/
 playwright-report/
 blob-report/
+tmp/
 
 # OS
 .DS_Store

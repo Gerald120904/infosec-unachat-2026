@@ -54,9 +54,16 @@ describe('Chat server', function () {
     closeClients();
   });
 
-  afterAll(function (done) {
+  afterAll(async function () {
     closeClients();
-    server.close(done);
+    await new Promise(function (resolve, reject) {
+      server.close(function (error) {
+        if (error) return reject(error);
+        resolve();
+      });
+    });
+    var sdk = require('../telemetry').sdk;
+    if (sdk) await sdk.shutdown();
   });
 
   describe('when a visitor requests the home page', function () {

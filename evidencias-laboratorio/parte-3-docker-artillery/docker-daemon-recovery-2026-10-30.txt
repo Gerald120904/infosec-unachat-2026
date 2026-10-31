@@ -1,0 +1,16 @@
+Docker Desktop recovery — 2026-10-30, 21:05 America/Costa_Rica
+
+Initial check:
+- Docker CLI client 29.9.2 was available.
+- docker version/info Server failed with: "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: El sistema no puede encontrar el archivo especificado."
+- Windows service com.docker.service was Stopped; Docker Desktop/backend processes were absent.
+
+Action:
+- Started the installed Docker Desktop application.
+- docker info then returned Engine 29.9.2, CPU 8, memory 4,024,045,568 bytes.
+- Compose showed UNA Chat had exited after daemon startup. Ran docker compose up -d una-chat to restart only this project service.
+
+Current checks:
+- GET http://127.0.0.1:3000/ returned HTTP 200.
+- fork-ger120904-una-chat-1 is healthy.
+- respondent-community-respondent-1 and respondent-community-cyberattack-proxy-1 remained running and were not stopped or changed.

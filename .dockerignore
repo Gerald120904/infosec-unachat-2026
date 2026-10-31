@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+.env.*
+!.env.example
+evidencias-laboratorio
+docs
+test
+integration
+e2e
+npm-debug.log*

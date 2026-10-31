@@ -1,0 +1,10 @@
+Docker/Sentry integration check — 2026-10-30
+
+- Rebuilt the UNA Chat image from the final package lock. Inside the Docker build, npm ci --omit=dev reported 0 vulnerabilities.
+- Docker Engine 29.9.2; the UNA Chat container runs Node.js v24.22.2 and Compose reports healthy.
+- GET / returned HTTP 200.
+- POST /__lab/message returned a valid response through the real message validator.
+- Native Node.js WebSocket completed an Engine.IO v4 / Socket.IO Evento-Mensaje-Server round trip.
+- The Sentry Node SDK API is present; the integration stays disabled in local Docker because VERCEL and SENTRY_DSN are unset. No Sentry key or outbound event was generated locally.
+- Docker stats sample: UNA Chat 0.51% CPU / 58.48 MiB; unrelated respondent container 31.82% CPU / 636.2 MiB; unrelated proxy 0.03% CPU / 24.09 MiB. Both unrelated containers were left running.
+- The full development audit reports 1 high, 24 moderate, 3 low. The remaining high is transitive serialize-javascript through Mocha; npm's only suggested fix downgrades Mocha to 5.0.5, a breaking major-version change. Production dependencies remain at 0 advisories.

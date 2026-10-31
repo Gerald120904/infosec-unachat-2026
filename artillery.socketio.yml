@@ -1,0 +1,17 @@
+config:
+  target: http://127.0.0.1:3000
+  phases:
+    - duration: 60
+      arrivalRate: 5
+  socketio:
+    transports: [websocket]
+scenarios:
+  - name: UNA Chat Socket.IO message exchange
+    engine: socketio
+    flow:
+      - emit:
+          channel: Evento-Mensaje-Server
+          data: '{"nombre":"Artillery","mensaje":"{{ $uuid }}","color":"#123456"}'
+        response:
+          channel: Evento-Mensaje-Server
+          data: '{"nombre":"Artillery","mensaje":"{{ $uuid }}","color":"#123456"}'

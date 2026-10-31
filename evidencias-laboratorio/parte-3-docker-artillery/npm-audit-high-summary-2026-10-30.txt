@@ -1,0 +1,8 @@
+brace-expansion: fixAvailable=True via=brace-expansion, brace-expansion, brace-expansion, brace-expansion, brace-expansion, brace-expansion, brace-expansion, brace-expansion
+braces: fixAvailable=True via=braces
+js-yaml: fixAvailable=True via=js-yaml, js-yaml, js-yaml, js-yaml, js-yaml
+minimatch: fixAvailable=@{name=artillery; version=0.0.2; isSemVerMajor=True} via=minimatch, minimatch, minimatch, minimatch, minimatch, minimatch, minimatch
+mocha: fixAvailable=True via=diff, glob, js-yaml, minimatch, nanoid, serialize-javascript
+nanoid: fixAvailable=True via=nanoid, nanoid, nanoid, nanoid
+picomatch: fixAvailable=True via=picomatch, picomatch
+serialize-javascript: fixAvailable=True via=serialize-javascript, serialize-javascript, serialize-javascript, serialize-javascript

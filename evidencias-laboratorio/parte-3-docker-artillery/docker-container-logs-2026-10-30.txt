@@ -1,0 +1,15 @@
+una-chat-1  | listening on *:3000
+una-chat-1  | Es un texto!
+una-chat-1  | {"level":30,"time":1793406114655,"pid":1,"hostname":"7514a3221560","trace_id":"7271c8f039210c5396ea39bb34c27336","span_id":"00423944017e286b","trace_flags":"01","deployment.environment":"local","event":"chat.message.processed","outcome":"success"}
+una-chat-1  | Es un texto!
+una-chat-1  | {"level":30,"time":1793406200948,"pid":1,"hostname":"7514a3221560","trace_id":"9925e08a0f43bcc35557d186bc3c0dcc","span_id":"f432d63ae1836553","trace_flags":"01","deployment.environment":"local","event":"chat.message.processed","outcome":"success"}
+una-chat-1  | {"level":30,"time":1793406201650,"pid":1,"hostname":"7514a3221560","trace_id":"6806cceaef5892c26a2895daa86efe5a","span_id":"fb766e46e61e96b2","trace_flags":"01","deployment.environment":"local","event":"http.request","method":"GET","route":"/","status":200,"duration_ms":135.371426}
+una-chat-1  | Es un texto!
+una-chat-1  | {"level":30,"time":1793406202350,"pid":1,"hostname":"7514a3221560","trace_id":"1931517d431a03b6d0ac4d15bc0b465f","span_id":"5d9043a09cfedaf1","trace_flags":"01","deployment.environment":"local","event":"http.request","method":"POST","route":"/__lab/message","status":200,"duration_ms":378.584023}
+una-chat-1  | {"level":30,"time":1793406239571,"pid":1,"hostname":"7514a3221560","trace_id":"1946c3ce9b8d2264f188ece6a5f39b9f","span_id":"4ef91ba4b0fc6bdc","trace_flags":"01","deployment.environment":"local","event":"http.request","method":"GET","route":"/","status":200,"duration_ms":72.00051}
+una-chat-1  | {"level":30,"time":1793406279473,"pid":1,"hostname":"7514a3221560","trace_id":"299416beb00e6db3c87792a34be93c67","span_id":"36c2f1db407ba02b","trace_flags":"01","deployment.environment":"local","event":"http.request","method":"GET","route":"/","status":200,"duration_ms":20.220646}
+una-chat-1  | {"level":30,"time":1793406280057,"pid":1,"hostname":"7514a3221560","trace_id":"1247019dbd03d7cdf5e504b5308524f0","span_id":"95455ca849f0803d","trace_flags":"01","deployment.environment":"local","event":"http.request","method":"GET","route":"/","status":200,"duration_ms":9.324857}
+una-chat-1  | Es un texto!
+una-chat-1  | {"level":30,"time":1793406280705,"pid":1,"hostname":"7514a3221560","trace_id":"862accc120843782e74f328337c0cde0","span_id":"76ac754c4cbe5e1b","trace_flags":"01","deployment.environment":"local","event":"chat.message.processed","outcome":"success"}
+una-chat-1  | Es un texto!
+una-chat-1  | {"level":30,"time":1793406391167,"pid":1,"hostname":"7514a3221560","trace_id":"67c05afdf8115a9e69c74fec3df48b58","span_id":"c9dc8bf9d0b54451","trace_flags":"01","deployment.environment":"local","event":"http.request","method":"POST","route":"/__lab/message","status":200,"duration_ms":199.35702}

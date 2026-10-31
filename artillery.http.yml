@@ -1,0 +1,18 @@
+config:
+  target: http://127.0.0.1:3000
+  phases:
+    - duration: 60
+      arrivalRate: 5
+scenarios:
+  - name: Local only message processing endpoint
+    engine: http
+    flow:
+      - post:
+          url: /__lab/message
+          json:
+            nombre: Artillery
+            mensaje: "{{ $uuid }}"
+            color: "#123456"
+          expect:
+            - statusCode: 200
+            - contentType: json

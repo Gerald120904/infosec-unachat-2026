@@ -1,0 +1,21 @@
+PARTE 3 — resultados de Artillery (2026-10-30, America/Costa_Rica)
+
+Ejecución Socket.IO (artillery.socketio.yml; motor nativo socketio):
+- Configuración: 60 s, 5 usuarios virtuales nuevos/s, destino 127.0.0.1:3000, un mensaje por usuario.
+- 300 VU creados, 300 completados, 300 emit, tasa 5/s, 0 VU fallidos.
+- Latencia Socket.IO: p50 7.6 ms, p95 77.5 ms, p99 111.1 ms.
+- Verificación independiente: 300 logs Pino chat.message.processed dentro del intervalo temporal de ejecución.
+- Informe Artillery: artillery-socketio-2026-10-30.json.
+
+Ejecución HTTP (artillery.http.yml; motor HTTP, solo endpoint /__lab/message local):
+- Configuración: 60 s, 5 VU/s, 127.0.0.1:3000.
+- 300 VU creados/completados, 300 solicitudes POST, 300 respuestas HTTP 200, 0 fallidas, tasa 5/s.
+- Latencia HTTP: p50 7.9 ms, p95 64.7 ms, p99 671.9 ms.
+- Verificación independiente: 300 logs Pino chat.message.processed con transport=http dentro del intervalo temporal de ejecución.
+- Informe Artillery: artillery-http-2026-10-30.json.
+
+Condiciones de recursos:
+- Docker Desktop: 8 CPU, 4,024,041,472 bytes de memoria; UNA Chat se mantuvo healthy, sin reinicios, máximo observado durante Socket.IO ~17% CPU y 48 MiB.
+- El contenedor ajeno respondent se mantuvo en ejecución como se pidió; durante la medición varió entre ~49% y ~270% CPU (una muestra anterior a la prueba alcanzó ~975%). El resultado es válido como prueba local en este equipo, pero esas variaciones pueden influir especialmente en p99; no se presenta como benchmark aislado de producción.
+
+Diferencia: Socket.IO produce eventos, no códigos HTTP. Solo la prueba HTTP usa POST/códigos 200, mediante un adaptador apagado por defecto y excluido de Vercel.

@@ -1,12 +1,12 @@
 var { test, expect } = require('@playwright/test');
 
 function openChat(page) {
-  var handshake = page.waitForResponse(function (response) {
-    return response.url().indexOf('/socket.io/') !== -1 && response.ok();
+  var connection = page.waitForEvent('websocket', function (websocket) {
+    return websocket.url().indexOf('/socket.io/') !== -1;
   });
 
   return page.goto('/').then(function () {
-    return handshake;
+    return connection;
   });
 }
 

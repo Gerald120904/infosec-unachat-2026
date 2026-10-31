@@ -221,7 +221,14 @@
      }
 
       $(function () {
-        var socket = io();
+        var socket = io({
+          transports: ['websocket'],
+          reconnection: true,
+          reconnectionAttempts: Infinity,
+          reconnectionDelay: 250,
+          reconnectionDelayMax: 3000,
+          timeout: 10000
+        });
 
         $('form').submit(function(){
             var nombreTxt = $('#nombre').val() || "Anomimo";

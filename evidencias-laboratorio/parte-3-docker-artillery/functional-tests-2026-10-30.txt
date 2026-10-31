@@ -1,0 +1,8 @@
+Fecha: 2026-10-30 (America/Costa_Rica)
+Runtime de verificación: Node.js v24.22.1 (runtime local compatible con la rama 24).
+Resultados tras la instrumentación de trazas y middleware:
+- Mocha unitarias: 12 passing.
+- Jest integración: 5 tests passed; se cerró el NodeSDK para liberar sus recursos al terminar.
+- Playwright E2E: 6 passed (1.5 min), contra UNA Chat servida por Docker en 127.0.0.1:3000.
+- Los tests de integración registraron HTTP 200 y broadcast Socket.IO; los Pino logs observados llevan trace_id y span_id en Docker.
+- Se registraron los resultados del navegador en la salida real de Playwright; la captura de interfaz y conversación está en los PNG adjuntos en esta carpeta.

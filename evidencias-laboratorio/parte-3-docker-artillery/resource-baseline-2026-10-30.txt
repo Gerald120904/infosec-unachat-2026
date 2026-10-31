@@ -1,0 +1,16 @@
+Timestamp | docker stats --no-stream
+2026-10-30T19:13:57.7192686-06:00
+CONTAINER ID   NAME                                       CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O     PIDS
+134e05fa651b   fork-ger120904-una-chat-1                  0.89%     41.39MiB / 3.748GiB   1.08%     2.5kB / 1.43kB    0B / 0B       11
+9a3bd492ca35   respondent-community-respondent-1          88.48%    875.7MiB / 3.748GiB   22.82%    72.5MB / 8.22MB   82.9MB / 0B   18
+ad81f22dae87   respondent-community-cyberattack-proxy-1   0.07%     27.62MiB / 3.748GiB   0.72%     4.24MB / 1.88MB   18.3MB / 0B   356
+2026-10-30T19:14:06.8028236-06:00
+CONTAINER ID   NAME                                       CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O     PIDS
+134e05fa651b   fork-ger120904-una-chat-1                  0.87%     41.39MiB / 3.748GiB   1.08%     2.5kB / 1.43kB    0B / 0B       11
+9a3bd492ca35   respondent-community-respondent-1          157.34%   878.7MiB / 3.748GiB   22.90%    72.7MB / 8.25MB   82.9MB / 0B   18
+ad81f22dae87   respondent-community-cyberattack-proxy-1   2.66%     27.33MiB / 3.748GiB   0.71%     4.24MB / 1.88MB   18.3MB / 0B   357
+2026-10-30T19:14:16.7704630-06:00
+CONTAINER ID   NAME                                       CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O     PIDS
+134e05fa651b   fork-ger120904-una-chat-1                  10.59%    41.9MiB / 3.748GiB    1.09%     2.5kB / 1.43kB    0B / 0B       11
+9a3bd492ca35   respondent-community-respondent-1          121.99%   883MiB / 3.748GiB     23.01%    72.8MB / 8.29MB   82.9MB / 0B   18
+ad81f22dae87   respondent-community-cyberattack-proxy-1   52.40%    27.27MiB / 3.748GiB   0.71%     4.25MB / 1.88MB   18.3MB / 0B   358

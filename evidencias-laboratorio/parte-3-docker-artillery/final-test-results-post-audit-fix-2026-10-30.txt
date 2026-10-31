@@ -1,0 +1,93 @@
+Runtime: v24.22.1
+
+=== npm run test ===
+
+> test
+> mocha --ui bdd
+
+
+
+  unalib
+    is_valid_phone
+      ✔ should accept a phone number with a dash
+      ✔ should reject a phone number that contains a letter
+    is_valid_url_image
+      ✔ should accept an http jpg url
+      ✔ should accept an http gif url
+    is_valid_yt_video
+      ✔ should accept a youtube watch url
+    script injection
+      when the message contains a script tag
+Es un texto!
+        ✔ should escape the tag so it is not executable html
+      when the username contains a script tag
+Es un texto!
+        ✔ should escape the username
+      when the color breaks out of the style attribute
+Es un texto!
+        ✔ should replace it with a safe hex color
+      when an image url uses the javascript scheme
+        ✔ should reject the url
+      when an image url hides a script tag
+Es un texto!
+        ✔ should keep the message as text and not build an image tag
+      when a youtube url hides a script tag
+        ✔ should reject the url and not build an iframe
+      when the message contains an onerror handler
+Es un texto!
+        ✔ should escape the markup
+
+
+  12 passing (30ms)
+
+exit_code=0
+
+=== npm run test:integration ===
+
+> test:integration
+> jest
+
+{"level":30,"time":1793417234559,"pid":6000,"hostname":"N00165689","deployment.environment":"local","event":"http.request","method":"GET","route":"/","status":200,"duration_ms":15.1897}
+  console.log
+    Es un texto!
+
+      at Object.log [as validateMessage] (libs/unalib.js:127:17)
+
+{"level":30,"time":1793417234732,"pid":6000,"hostname":"N00165689","deployment.environment":"local","event":"chat.message.processed","outcome":"success"}
+  console.log
+    Es un texto!
+
+      at Object.log [as validateMessage] (libs/unalib.js:127:17)
+
+{"level":30,"time":1793417234769,"pid":6000,"hostname":"N00165689","deployment.environment":"local","event":"chat.message.processed","outcome":"success"}
+  console.log
+    Es una imagen!
+
+      at Object.log [as validateMessage] (libs/unalib.js:119:17)
+
+{"level":30,"time":1793417234799,"pid":6000,"hostname":"N00165689","deployment.environment":"local","event":"chat.message.processed","outcome":"success"}
+  console.log
+    Es un video!
+
+      at Object.log [as validateMessage] (libs/unalib.js:123:17)
+
+{"level":30,"time":1793417234826,"pid":6000,"hostname":"N00165689","deployment.environment":"local","event":"chat.message.processed","outcome":"success"}
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        5.355 s, estimated 49 s
+Ran all test suites.
+exit_code=0
+
+=== npm run test:e2e ===
+
+> test:e2e
+> playwright test
+
+
+Running 6 tests using 1 worker
+(node:11324) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+······
+  6 passed (26.9s)
+exit_code=0

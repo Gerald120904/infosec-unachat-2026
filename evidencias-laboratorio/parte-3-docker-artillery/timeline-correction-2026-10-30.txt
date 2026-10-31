@@ -1,0 +1,3 @@
+2026-10-30 — rectificacion del archivo de validacion inicial
+El texto de carga retenida pertenecia a la primera verificacion y no al estado final. Tras comprobacion posterior de recursos se corrieron las dos cargas: 300 mensajes Socket.IO correctos y 300 solicitudes HTTP 200. La limitacion por CPU ajena se conserva como factor de variabilidad para p99; no se detuvo el contenedor externo.
+

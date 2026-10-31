@@ -1,0 +1,8 @@
+Docker post-restart functional check — 2026-10-30
+
+- `docker compose ps`: fork-ger120904-una-chat-1 healthy, published only as 127.0.0.1:3000.
+- GET / returned HTTP 200.
+- POST /__lab/message returned a valid response using the real chat message validator.
+- Socket.IO Engine.IO v4 WebSocket exchange performed with Node.js 24.22.2 built-in WebSocket; event Evento-Mensaje-Server round trip returned the expected sanitized JSON.
+- The app container only installs production dependencies, so this smoke check used the native WebSocket client instead of socket.io-client.
+- The two unrelated respondent-community containers remained running.

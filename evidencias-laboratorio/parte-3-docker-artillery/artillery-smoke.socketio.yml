@@ -1,0 +1,17 @@
+config:
+  target: http://127.0.0.1:3000
+  phases:
+    - duration: 1
+      arrivalRate: 1
+  socketio:
+    transports: [websocket]
+scenarios:
+  - name: One real UNA Chat message smoke test
+    engine: socketio
+    flow:
+      - emit:
+          channel: Evento-Mensaje-Server
+          data: '{"nombre":"Artillery smoke","mensaje":"{{ $uuid }}","color":"#123456"}'
+        response:
+          channel: Evento-Mensaje-Server
+          data: '{"nombre":"Artillery smoke","mensaje":"{{ $uuid }}","color":"#123456"}'

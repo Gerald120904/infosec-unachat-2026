@@ -1,0 +1,15 @@
+services:
+  una-chat:
+    build: .
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      PORT: "3000"
+      NODE_ENV: production
+      DEPLOYMENT_ENVIRONMENT: local
+      LAB_HTTP_TEST_ENABLED: "true"
+      OTEL_SERVICE_NAME: una-chat
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment=local,runtime=docker
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_EXPORTER_OTLP_HEADERS:-}

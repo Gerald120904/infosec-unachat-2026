@@ -1,0 +1,6 @@
+Fecha: 2026-10-30
+
+Validación local de YAML
+- artillery.socketio.yml: parsea como YAML; target loopback 127.0.0.1:3000; fase 60 s, arrivalRate 5; motor socketio; escenario envía Evento-Mensaje-Server con cadena JSON y correlaciona la respuesta por UUID único del usuario virtual.
+- artillery.http.yml: parsea como YAML; target loopback 127.0.0.1:3000; fase 60 s, arrivalRate 5; motor http; POST al adaptador /__lab/message (local, detrás de LAB_HTTP_TEST_ENABLED y no disponible en Vercel).
+- Prueba de carga aún no ejecutada: requiere terminar instalación y medir estabilidad de recursos inmediatamente antes.
