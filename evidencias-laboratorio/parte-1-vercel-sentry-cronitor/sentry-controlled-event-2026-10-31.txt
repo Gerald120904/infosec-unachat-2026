@@ -1,0 +1,7 @@
+Fecha: 2026-10-31 (Costa Rica)
+Servicio: Sentry, proyecto una-chat-vercel, organización gerald-aw0
+Entorno: Vercel Production, UNA Chat
+Prueba: se solicitó un error controlado mediante la ruta protegida temporal desde el dominio asignado de Vercel; la respuesta HTTP 500 era esperada para generar el evento.
+Resultado: Sentry Issues Feed mostró “UNA Chat controlled Sentry verification event”, código UNA-CHAT-VERCEL-1, conteo de eventos 1.
+Seguimiento: la ruta temporal se retiró del código fuente. Queda quitar las variables temporales de Vercel y publicar el commit de limpieza.
+Privacidad: captura original sin tokens, DSN ni datos del chat.

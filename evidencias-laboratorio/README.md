@@ -1,12 +1,12 @@
-# Índice de evidencias — 30 de octubre de 2026
+# Índice de evidencias — actualización 31 de octubre de 2026
 
 Todas las imágenes listadas son capturas originales del navegador local de laboratorio. No se guardaron capturas de plataformas externas sin acceso de sesión. No se retocaron los estados del servicio; las imágenes originales se conservan.
 
 ## Parte 1 — Vercel, Cronitor y Sentry
 
-- Vercel: el fork `Gerald120904/infosec-unachat-2026` está desplegado en https://infosec-unachat-2026.vercel.app. Dos clientes reales de navegador se conectaron por WebSocket Socket.IO e intercambiaron mensajes. Capturas `parte-1-vercel-sentry-cronitor/01-vercel-chat-funcionando-2026-10-30.png` y `02-vercel-dos-clientes-2026-10-30.png`; prueba resumida en `vercel-chat-test-2026-10-30.txt`.
+- Vercel: el fork `Gerald120904/infosec-unachat-2026` está desplegado en https://infosec-unachat-2026-black.vercel.app. Dos clientes reales de navegador se conectaron por WebSocket Socket.IO e intercambiaron mensajes. Capturas `parte-1-vercel-sentry-cronitor/01-vercel-chat-funcionando-2026-10-30.png` y `02-vercel-dos-clientes-2026-10-30.png`; prueba resumida en `vercel-chat-test-2026-10-30.txt`.
 - Cronitor: se creó `UNA Chat - Vercel` para la URL pública, con GET cada 5 minutos, alertas activas y lista `Default`. El primer chequeo comprobó Healthy, HTTP 200 y 260 ms desde Frankfurt. Captura de configuración en `parte-1-vercel-sentry-cronitor/04-cronitor-vercel-monitor-created-2026-10-30.png` y resultado saludable en `05-cronitor-vercel-healthy-2026-10-30.png`. Monitor real: https://cronitor.io/app/monitors/UTzIWf. `UNA Chat - Render` continúa separado y Healthy; captura en `03-cronitor-render-healthy-2026-10-30.png`.
-- Sentry: proyecto `una-chat-vercel` creado en la organización `gerald-aw0`; el Issues Feed real aún muestra el onboarding sin eventos. Captura `parte-1-vercel-sentry-cronitor/06-sentry-project-no-events-yet-2026-10-30.png` registra ese estado. DSN y otros secretos no se incluyen en las capturas ni el repositorio. La integración en Vercel y el evento controlado siguen pendientes.
+- Sentry: proyecto `una-chat-vercel` en `gerald-aw0` recibió el error controlado de verificación desde Vercel Production (1 evento). La captura original `parte-1-vercel-sentry-cronitor/07-sentry-controlled-event-2026-10-31.jpg` muestra el issue en el Feed. La captura anterior 06 documenta el estado inicial sin eventos. El código de la ruta temporal ya se retiró localmente; falta eliminar las variables temporales de Vercel y publicar la limpieza. DSN y otros secretos se excluyen de las capturas y del repositorio.
 
 ## Parte 2 — Grafana Cloud
 
@@ -31,6 +31,6 @@ El archivo `parte-3-docker-artillery/pino-trace-correlation-2026-10-30.txt` regi
 
 Los resultados de carga se conservan como reportes de consola de Artillery y archivos YAML ejecutables, junto con logs Pino y verificaciones del daemon. Los logs se guardan sin campos de credenciales y sin registrar el texto de mensajes.
 
-La suite repetida tras actualizar Mocha a 12.0.3 aprobó 12 Mocha, 5 Jest y 6 Playwright (23/23) con Node 24.22.1; el registro está en `parte-3-docker-artillery/node24-tests-after-mocha12-2026-10-30.txt`. El `npm ci` local completo no terminó por la lentitud de reify en Windows; se deja constancia y no se afirma que haya finalizado. En Docker, la instalación de producción y su auditoría sí terminaron con 0 vulnerabilidades.
+La suite repetida tras actualizar Mocha a 12.0.3 aprobó 12 Mocha, 5 Jest y 6 Playwright (23/23) con Node 24.22.1; el registro está en `parte-3-docker-artillery/node24-tests-after-mocha12-2026-10-30.txt`. Se está repitiendo `npm ci` local en Node 24.22.2 tras corregir código; no se afirmará finalización hasta que el comando concluya. En Docker, la instalación de producción y su auditoría sí terminaron con 0 vulnerabilidades.
 
 Las pruebas anteriores posteriores al ajuste de seguridad/Sentry aparecen en `parte-3-docker-artillery/final-test-results-sentry-2026-10-30.txt`. El build final de Docker y la prueba funcional posterior constan en `parte-3-docker-artillery/docker-build-sentry-10-postcheck-2026-10-30.txt`. `parte-3-docker-artillery/docker-daemon-recovery-2026-10-30.txt` deja constancia de la indisponibilidad transitoria de la API Docker y de su recuperación sin intervenir en contenedores ajenos.

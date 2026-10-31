@@ -70,19 +70,6 @@ if (process.env.LAB_HTTP_TEST_ENABLED === 'true' && process.env.VERCEL !== '1') 
   });
 }
 
-if (sentry && process.env.SENTRY_LAB_TEST_ENABLED === 'true') {
-  var sentryLabTestPath = process.env.VERCEL === '1' ? '/api/__lab/sentry-test' : '/__lab/sentry-test';
-  app.get(sentryLabTestPath, function(req, res, next) {
-    var expected = process.env.SENTRY_LAB_TEST_SECRET || '';
-    var supplied = req.get('authorization') || '';
-    var expectedHeader = 'Bearer ' + expected;
-    var authorized = expected.length > 0 && supplied.length === expectedHeader.length &&
-      require('crypto').timingSafeEqual(Buffer.from(supplied), Buffer.from(expectedHeader));
-    if (!authorized) return res.sendStatus(404);
-    next(new Error('UNA Chat controlled Sentry verification event'));
-  });
-}
-
 if (sentry) sentry.setupExpressErrorHandler(app);
 
 // escuchar una conexion por socket
