@@ -10,7 +10,7 @@ module.exports = defineConfig({
   },
   use: {
     ...devices['Desktop Chrome'],
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://127.0.0.1:3100',
     headless: Boolean(process.env.CI),
     launchOptions: {
       slowMo: process.env.CI ? 0 : 1000
@@ -18,8 +18,15 @@ module.exports = defineConfig({
   },
   webServer: {
     command: 'npm start',
-    url: 'http://127.0.0.1:3000',
-    reuseExistingServer: true,
+    env: {
+      NODE_ENV: 'test',
+      PORT: '3100',
+      AUTH0_DOMAIN: '',
+      AUTH0_CLIENT_ID: '',
+      REQUIRE_AUTH: ''
+    },
+    url: 'http://127.0.0.1:3100',
+    reuseExistingServer: false,
     timeout: 30000
   }
 });

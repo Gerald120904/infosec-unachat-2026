@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY server.js index.html ./
 COPY libs ./libs
+COPY server ./server
 COPY telemetry.js logger.js sentry.js ./
 COPY docker-entrypoint.sh ./
 RUN chmod 755 ./docker-entrypoint.sh

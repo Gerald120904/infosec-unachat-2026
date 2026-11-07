@@ -1,8 +1,13 @@
 
+if (process.env.NODE_ENV !== 'test') {
+  require('dotenv').config({ quiet: true });
+}
+
 // Load monitoring before Express/HTTP so instrumentation can patch modules.
 var sentry = require('./sentry');
 var telemetry = require('./telemetry');
 var logger = require('./logger');
+var lab8 = require('./server/lab8-integration');
 
 // libreriuas
 var validation = require('./libs/unalib');
@@ -70,6 +75,8 @@ if (process.env.LAB_HTTP_TEST_ENABLED === 'true' && process.env.VERCEL !== '1') 
   });
 }
 
+lab8.register(app, io);
+
 if (sentry) sentry.setupExpressErrorHandler(app);
 
 // escuchar una conexion por socket
@@ -84,7 +91,7 @@ io.on('connection', function(socket){
     var activeContext = api.trace.setSpan(api.context.active(), span);
     try {
       api.context.with(activeContext, function() {
-        var result = processMessage(msg);
+        var result = processMessage(socket.data && socket.data.user ? lab8.stampSender(msg, socket.data.user.name) : msg);
         if (messages) messages.add(1, { outcome: 'success' });
         logger.info({ event: 'chat.message.processed', outcome: 'success', transport: 'socket.io' });
         io.emit('Evento-Mensaje-Server', result);
@@ -103,8 +110,13 @@ io.on('connection', function(socket){
 });
 
 if (require.main === module) {
-  http.listen(port, function(){
-    console.log('listening on *:' + port);
+  lab8.boot().then(function () {
+    http.listen(port, function(){
+      console.log('listening on *:' + port);
+    });
+  }).catch(function () {
+    logger.error({ event: 'auth.startup_failed', reason: 'Vault or Auth0 unavailable' });
+    process.exit(1);
   });
 }
 
